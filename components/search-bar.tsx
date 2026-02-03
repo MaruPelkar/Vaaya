@@ -65,7 +65,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Search for a company..."
-          className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none bg-white"
+          className="w-full px-6 py-4 text-lg font-medium border-2 border-gray-300 rounded-xl focus:border-blue-600 focus:outline-none bg-white placeholder-gray-600"
         />
         {isLoading && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -75,26 +75,26 @@ export function SearchBar({ onSelect }: SearchBarProps) {
       </div>
 
       {isOpen && (
-        <div className="absolute w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+        <div className="absolute w-full mt-3 bg-white border border-gray-300 rounded-xl shadow-xl z-50 overflow-hidden">
           {results.map((result) => (
             <button
               key={result.domain}
               onClick={() => handleSelect(result)}
-              className="w-full px-4 py-3 flex items-center gap-4 hover:bg-gray-50 text-left"
+              className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 text-left transition-colors border-b border-gray-100 last:border-b-0"
             >
               {result.logo && (
                 <img
                   src={result.logo}
                   alt={result.name}
-                  className="w-8 h-8 rounded bg-gray-100"
+                  className="w-10 h-10 rounded-lg bg-gray-100"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
               )}
-              <div>
-                <div className="font-medium text-gray-900">{result.name}</div>
-                <div className="text-sm text-gray-500">{result.domain}</div>
+              <div className="flex-1">
+                <div className="font-bold text-gray-900">{result.name}</div>
+                <div className="text-sm text-gray-600 font-mono">{result.domain}</div>
               </div>
             </button>
           ))}

@@ -65,18 +65,18 @@ const SIGNAL_COLORS: Partial<Record<SignalSource, string>> = {
 
 export function SignalBadge({ signal }: { signal: Signal }) {
   const label = SIGNAL_LABELS[signal.type] || signal.type;
-  const color = SIGNAL_COLORS[signal.type] || 'bg-gray-100 text-gray-700';
+  const color = SIGNAL_COLORS[signal.type] || 'bg-gray-200 text-gray-800';
 
   return (
     <a
       href={signal.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${color} hover:opacity-80`}
+      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide ${color} hover:shadow-md transition-shadow`}
       title={signal.snippet}
     >
       {label}
-      <span className="opacity-60">({Math.round(signal.confidence * 100)}%)</span>
+      <span className="font-bold">({Math.round(signal.confidence * 100)}%)</span>
     </a>
   );
 }

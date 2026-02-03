@@ -31,19 +31,19 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {/* EXECUTIVE BRIEF */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
 
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border border-slate-200">
-        <h2 className="text-xl font-bold text-slate-800 mb-6">Executive Brief</h2>
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-8 border border-slate-200">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">Executive Brief</h2>
 
         {/* What's New Section */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">🚀</span>
-            <h3 className="font-semibold text-slate-700">What's New</h3>
+            <h3 className="text-xl font-semibold text-gray-900">What's New</h3>
             <span className="text-xs text-slate-500 ml-auto">{executive_brief.whats_new.time_period}</span>
           </div>
           <p className="text-slate-600 text-sm mb-4">{executive_brief.whats_new.summary}</p>
@@ -68,48 +68,48 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
         </div>
 
         {/* Market Reaction Section */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">📊</span>
-            <h3 className="font-semibold text-slate-700">Market Reaction</h3>
-            <div className="ml-auto flex items-center gap-2">
-              <span className={`px-2 py-1 rounded text-xs font-medium ${getSentimentLabel(executive_brief.market_reaction.sentiment.label).color}`}>
+            <h3 className="text-xl font-semibold text-gray-900">Market Reaction</h3>
+            <div className="ml-auto flex items-center gap-3">
+              <span className={`px-3 py-1 rounded text-xs font-medium ${getSentimentLabel(executive_brief.market_reaction.sentiment.label).color}`}>
                 {getSentimentLabel(executive_brief.market_reaction.sentiment.label).text}
               </span>
-              <span className="text-sm font-bold text-slate-700">{executive_brief.market_reaction.sentiment.score}</span>
+              <span className="text-xl font-bold text-gray-900">{executive_brief.market_reaction.sentiment.score}</span>
             </div>
           </div>
-          <p className="text-slate-600 text-sm mb-4">{executive_brief.market_reaction.summary}</p>
+          <p className="text-gray-700 text-base mb-6 leading-relaxed">{executive_brief.market_reaction.summary}</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Positive Themes */}
-            <div className="bg-white rounded-lg p-4 border border-green-100">
-              <h4 className="text-sm font-medium text-green-700 mb-2">What People Love</h4>
-              <ul className="space-y-1">
+            <div className="bg-white rounded-lg p-6 border border-green-300 shadow-sm">
+              <h4 className="text-base font-bold text-green-700 mb-3">What People Love</h4>
+              <ul className="space-y-2">
                 {executive_brief.market_reaction.positive_themes.slice(0, 4).map((theme, i) => (
-                  <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                    <span className="text-green-500 mt-0.5">+</span>
+                  <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5 font-bold">+</span>
                     <span>{theme.theme}</span>
                   </li>
                 ))}
                 {executive_brief.market_reaction.positive_themes.length === 0 && (
-                  <li className="text-sm text-slate-400">No data available</li>
+                  <li className="text-sm text-gray-500">No data available</li>
                 )}
               </ul>
             </div>
 
             {/* Negative Themes */}
-            <div className="bg-white rounded-lg p-4 border border-red-100">
-              <h4 className="text-sm font-medium text-red-700 mb-2">Concerns Raised</h4>
-              <ul className="space-y-1">
+            <div className="bg-white rounded-lg p-6 border border-red-300 shadow-sm">
+              <h4 className="text-base font-bold text-red-700 mb-3">Concerns Raised</h4>
+              <ul className="space-y-2">
                 {executive_brief.market_reaction.negative_themes.slice(0, 4).map((theme, i) => (
-                  <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                    <span className="text-red-500 mt-0.5">-</span>
+                  <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-red-600 mt-0.5 font-bold">-</span>
                     <span>{theme.theme}</span>
                   </li>
                 ))}
                 {executive_brief.market_reaction.negative_themes.length === 0 && (
-                  <li className="text-sm text-slate-400">No data available</li>
+                  <li className="text-sm text-gray-500">No data available</li>
                 )}
               </ul>
             </div>
@@ -117,11 +117,11 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
 
           {/* Notable Reactions */}
           {executive_brief.market_reaction.notable_reactions.length > 0 && (
-            <div className="mt-4 p-3 bg-white rounded-lg border border-slate-200">
-              <div className="text-sm text-slate-700 italic">
+            <div className="mt-6 p-6 bg-white rounded-lg border border-gray-300 shadow-sm">
+              <div className="text-base text-gray-900 italic">
                 "{executive_brief.market_reaction.notable_reactions[0].quote}"
               </div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-sm text-gray-600 mt-3 font-medium">
                 — {executive_brief.market_reaction.notable_reactions[0].source}
                 {executive_brief.market_reaction.notable_reactions[0].author_context &&
                   ` (${executive_brief.market_reaction.notable_reactions[0].author_context})`}
@@ -132,23 +132,23 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
 
         {/* Product Direction Section */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">🔮</span>
-            <h3 className="font-semibold text-slate-700">Product Direction</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Product Direction</h3>
           </div>
-          <p className="text-slate-600 text-sm mb-4">{executive_brief.product_direction.summary}</p>
+          <p className="text-gray-700 text-base mb-6 leading-relaxed">{executive_brief.product_direction.summary}</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Confirmed Roadmap */}
             {executive_brief.product_direction.confirmed_roadmap.length > 0 && (
-              <div className="bg-white rounded-lg p-4 border border-slate-200">
-                <h4 className="text-sm font-medium text-slate-700 mb-2">Confirmed Roadmap</h4>
+              <div className="bg-white rounded-lg p-6 border border-gray-300 shadow-sm">
+                <h4 className="text-base font-bold text-gray-900 mb-3">Confirmed Roadmap</h4>
                 <ul className="space-y-2">
                   {executive_brief.product_direction.confirmed_roadmap.slice(0, 3).map((item, i) => (
-                    <li key={i} className="text-sm">
-                      <span className="text-slate-700">{item.feature}</span>
+                    <li key={i} className="text-sm text-gray-700">
+                      <span>{item.feature}</span>
                       {item.expected_timeline && (
-                        <span className="text-xs text-blue-600 ml-2">({item.expected_timeline})</span>
+                        <span className="text-xs text-blue-600 font-medium ml-2">({item.expected_timeline})</span>
                       )}
                     </li>
                   ))}
@@ -158,14 +158,14 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
 
             {/* Top Requested Features */}
             {executive_brief.product_direction.top_requested_features.length > 0 && (
-              <div className="bg-white rounded-lg p-4 border border-slate-200">
-                <h4 className="text-sm font-medium text-slate-700 mb-2">Top Requested</h4>
+              <div className="bg-white rounded-lg p-6 border border-gray-300 shadow-sm">
+                <h4 className="text-base font-bold text-gray-900 mb-3">Top Requested</h4>
                 <ul className="space-y-2">
                   {executive_brief.product_direction.top_requested_features.slice(0, 3).map((item, i) => (
-                    <li key={i} className="text-sm flex items-center gap-2">
-                      <span className="text-slate-700">{item.feature}</span>
+                    <li key={i} className="text-sm text-gray-700 flex items-center gap-2">
+                      <span>{item.feature}</span>
                       {item.vote_count && (
-                        <span className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                        <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded font-medium">
                           {item.vote_count} votes
                         </span>
                       )}
@@ -197,8 +197,8 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
       {/* DETAIL TABS */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
 
-      <div className="border-b border-slate-200">
-        <nav className="flex gap-4">
+      <div className="border-b border-gray-300 mb-8">
+        <nav className="flex gap-6">
           {[
             { id: 'official', label: 'Official Sources', icon: '📋' },
             { id: 'community', label: 'Community & Social', icon: '💬' },
@@ -207,10 +207,10 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
             <button
               key={tab.id}
               onClick={() => setActiveDetailTab(tab.id as DetailTab)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-4 py-3 text-base font-semibold border-b-2 transition-colors ${
                 activeDetailTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
+                  ? 'border-gray-900 text-gray-900'
+                  : 'border-transparent text-gray-500 hover:text-gray-900'
               }`}
             >
               <span className="mr-2">{tab.icon}</span>
@@ -222,22 +222,22 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
 
       {/* Official Sources Tab */}
       {activeDetailTab === 'official' && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Review Platforms */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* G2 */}
             {tier1.g2 && (
-              <a href={tier1.g2.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-white rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-slate-700">G2</span>
+              <a href={tier1.g2.url} target="_blank" rel="noopener noreferrer" className="p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-bold text-gray-900">G2</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-lg font-bold text-slate-800">{tier1.g2.overall_rating.toFixed(1)}</span>
-                    <span className="text-yellow-500">★</span>
+                    <span className="text-2xl font-bold text-gray-900">{tier1.g2.overall_rating.toFixed(1)}</span>
+                    <span className="text-yellow-500 text-lg">★</span>
                   </div>
                 </div>
-                <div className="text-sm text-slate-500">{tier1.g2.total_reviews} reviews</div>
+                <div className="text-sm text-gray-600 font-medium">{tier1.g2.total_reviews} reviews</div>
                 {tier1.g2.categories[0]?.badge && (
-                  <div className="mt-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded inline-block">
+                  <div className="mt-3 text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium inline-block">
                     {tier1.g2.categories[0].badge}
                   </div>
                 )}
@@ -246,29 +246,29 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
 
             {/* Capterra */}
             {tier1.capterra && (
-              <a href={tier1.capterra.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-white rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-slate-700">Capterra</span>
+              <a href={tier1.capterra.url} target="_blank" rel="noopener noreferrer" className="p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-bold text-gray-900">Capterra</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-lg font-bold text-slate-800">{tier1.capterra.overall_rating.toFixed(1)}</span>
-                    <span className="text-yellow-500">★</span>
+                    <span className="text-2xl font-bold text-gray-900">{tier1.capterra.overall_rating.toFixed(1)}</span>
+                    <span className="text-yellow-500 text-lg">★</span>
                   </div>
                 </div>
-                <div className="text-sm text-slate-500">{tier1.capterra.total_reviews} reviews</div>
+                <div className="text-sm text-gray-600 font-medium">{tier1.capterra.total_reviews} reviews</div>
               </a>
             )}
 
             {/* TrustRadius */}
             {tier1.trustradius && (
-              <a href={tier1.trustradius.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-white rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-slate-700">TrustRadius</span>
+              <a href={tier1.trustradius.url} target="_blank" rel="noopener noreferrer" className="p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-bold text-gray-900">TrustRadius</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-lg font-bold text-slate-800">{tier1.trustradius.tr_score.toFixed(1)}</span>
-                    <span className="text-sm text-slate-500">/10</span>
+                    <span className="text-2xl font-bold text-gray-900">{tier1.trustradius.tr_score.toFixed(1)}</span>
+                    <span className="text-sm text-gray-600 font-medium">/10</span>
                   </div>
                 </div>
-                <div className="text-sm text-slate-500">{tier1.trustradius.total_reviews} reviews</div>
+                <div className="text-sm text-gray-600 font-medium">{tier1.trustradius.total_reviews} reviews</div>
               </a>
             )}
           </div>
@@ -276,13 +276,13 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
           {/* LinkedIn Posts */}
           {tier1.linkedin && tier1.linkedin.company_posts.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">LinkedIn Activity</h3>
-              <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">LinkedIn Activity</h3>
+              <div className="space-y-4">
                 {tier1.linkedin.company_posts.slice(0, 3).map((post, i) => (
-                  <a key={i} href={post.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white rounded-lg border border-slate-200 hover:bg-slate-50">
-                    <div className="text-sm text-slate-700">{post.content_snippet}</div>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                      <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded">{post.post_type.replace('_', ' ')}</span>
+                  <a key={i} href={post.url} target="_blank" rel="noopener noreferrer" className="block p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-base text-gray-700">{post.content_snippet}</div>
+                    <div className="flex items-center gap-4 mt-3 text-xs font-medium text-gray-600">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">{post.post_type.replace('_', ' ')}</span>
                       <span>{post.engagement.likes} likes</span>
                       <span>{post.date}</span>
                     </div>
@@ -295,16 +295,16 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
           {/* Press Releases */}
           {tier1.press_releases.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Press & News</h3>
-              <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Press & News</h3>
+              <div className="space-y-4">
                 {tier1.press_releases.slice(0, 5).map((press, i) => (
-                  <a key={i} href={press.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white rounded-lg border border-slate-200 hover:bg-slate-50">
-                    <div className="font-medium text-slate-800">{press.title}</div>
-                    <div className="text-sm text-slate-600 mt-1">{press.snippet}</div>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
+                  <a key={i} href={press.url} target="_blank" rel="noopener noreferrer" className="block p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="font-bold text-gray-900">{press.title}</div>
+                    <div className="text-sm text-gray-700 mt-2">{press.snippet}</div>
+                    <div className="flex items-center gap-3 mt-3 text-xs font-medium text-gray-600">
                       <span>{press.source}</span>
                       <span>{press.date}</span>
-                      <span className="px-2 py-0.5 bg-slate-100 rounded">{press.category}</span>
+                      <span className="px-2 py-1 bg-gray-200 text-gray-700 rounded">{press.category}</span>
                     </div>
                   </a>
                 ))}
@@ -316,19 +316,19 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
 
       {/* Community Tab */}
       {activeDetailTab === 'community' && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Aggregate Sentiment */}
-          <div className="p-4 bg-slate-50 rounded-lg">
+          <div className="p-6 bg-gray-50 rounded-lg border border-gray-300">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-600">Overall Community Sentiment</span>
+              <span className="text-base font-medium text-gray-700">Overall Community Sentiment</span>
               <div className="flex items-center gap-3">
-                <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-32 h-3 bg-gray-300 rounded-full overflow-hidden">
                   <div className={`h-full ${getSentimentColor(tier2.aggregate_sentiment.score)}`} style={{ width: `${tier2.aggregate_sentiment.score}%` }} />
                 </div>
-                <span className="font-bold text-slate-700">{tier2.aggregate_sentiment.score}</span>
+                <span className="font-bold text-lg text-gray-900">{tier2.aggregate_sentiment.score}</span>
               </div>
             </div>
-            <div className="text-xs text-slate-500 mt-2">
+            <div className="text-sm text-gray-600 mt-3 font-medium">
               Based on {tier2.aggregate_sentiment.total_mentions} mentions • Most active on {tier2.aggregate_sentiment.most_active_platform}
             </div>
           </div>
@@ -336,23 +336,23 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
           {/* Reddit */}
           {tier2.reddit && (
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Reddit Discussions</h3>
-              <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Reddit Discussions</h3>
+              <div className="space-y-4">
                 {tier2.reddit.top_threads.slice(0, 4).map((thread, i) => (
-                  <a key={i} href={thread.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white rounded-lg border border-slate-200 hover:bg-slate-50">
+                  <a key={i} href={thread.url} target="_blank" rel="noopener noreferrer" className="block p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="font-medium text-slate-800">{thread.title}</div>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                          <span className="text-orange-500">{thread.subreddit}</span>
+                        <div className="font-bold text-gray-900">{thread.title}</div>
+                        <div className="flex items-center gap-3 mt-2 text-xs font-medium text-gray-600">
+                          <span className="text-orange-600">{thread.subreddit}</span>
                           <span>{thread.score} pts</span>
                           <span>{thread.num_comments} comments</span>
                         </div>
                       </div>
-                      <span className={`px-2 py-0.5 text-xs rounded ${
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${
                         thread.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
                         thread.sentiment === 'negative' ? 'bg-red-100 text-red-700' :
-                        'bg-slate-100 text-slate-600'
+                        'bg-gray-200 text-gray-700'
                       }`}>
                         {thread.sentiment}
                       </span>
@@ -366,16 +366,16 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
           {/* Hacker News */}
           {tier2.hacker_news && tier2.hacker_news.top_stories.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Hacker News</h3>
-              <div className="text-sm text-slate-500 mb-3">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Hacker News</h3>
+              <div className="text-sm font-medium text-gray-600 mb-4">
                 {tier2.hacker_news.total_stories} stories • {tier2.hacker_news.total_comments} comments
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {tier2.hacker_news.top_stories.slice(0, 3).map((story, i) => (
-                  <a key={i} href={story.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white rounded-lg border border-slate-200 hover:bg-orange-50">
-                    <div className="font-medium text-slate-800">{story.title}</div>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
-                      <span className="text-orange-500">{story.points} points</span>
+                  <a key={i} href={story.url} target="_blank" rel="noopener noreferrer" className="block p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="font-bold text-gray-900">{story.title}</div>
+                    <div className="flex items-center gap-3 mt-3 text-xs font-medium text-gray-600">
+                      <span className="text-orange-600">{story.points} points</span>
                       <span>{story.num_comments} comments</span>
                     </div>
                   </a>
@@ -387,13 +387,13 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
           {/* Twitter */}
           {tier2.twitter && tier2.twitter.notable_tweets.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Twitter/X Mentions</h3>
-              <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Twitter/X Mentions</h3>
+              <div className="space-y-4">
                 {tier2.twitter.notable_tweets.slice(0, 3).map((tweet, i) => (
-                  <a key={i} href={tweet.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white rounded-lg border border-slate-200 hover:bg-blue-50">
-                    <div className="text-sm text-slate-700">{tweet.content}</div>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
-                      <span className="text-blue-500">@{tweet.author_handle}</span>
+                  <a key={i} href={tweet.url} target="_blank" rel="noopener noreferrer" className="block p-6 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-base text-gray-700">{tweet.content}</div>
+                    <div className="flex items-center gap-3 mt-3 text-xs font-medium text-gray-600">
+                      <span className="text-blue-600">@{tweet.author_handle}</span>
                       <span>{tweet.likes} likes</span>
                       <span>{tweet.date}</span>
                     </div>
@@ -406,13 +406,13 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
           {/* Product Hunt */}
           {tier2.product_hunt?.latest_launch && (
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">Product Hunt</h3>
-              <a href={tier2.product_hunt.latest_launch.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white rounded-lg border border-orange-200 hover:bg-orange-50">
-                <div className="font-medium text-slate-800">{tier2.product_hunt.latest_launch.name}</div>
-                <div className="text-sm text-slate-600 mt-1">{tier2.product_hunt.latest_launch.tagline}</div>
-                <div className="flex items-center gap-3 mt-2 text-sm">
-                  <span className="text-orange-500 font-bold">▲ {tier2.product_hunt.latest_launch.upvotes}</span>
-                  <span className="text-slate-500">{tier2.product_hunt.latest_launch.date}</span>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Product Hunt</h3>
+              <a href={tier2.product_hunt.latest_launch.url} target="_blank" rel="noopener noreferrer" className="block p-6 bg-white rounded-lg border border-orange-300 shadow-sm hover:shadow-md transition-shadow">
+                <div className="font-bold text-gray-900">{tier2.product_hunt.latest_launch.name}</div>
+                <div className="text-sm text-gray-700 mt-2">{tier2.product_hunt.latest_launch.tagline}</div>
+                <div className="flex items-center gap-3 mt-3 text-sm font-medium">
+                  <span className="text-orange-600">▲ {tier2.product_hunt.latest_launch.upvotes}</span>
+                  <span className="text-gray-600">{tier2.product_hunt.latest_launch.date}</span>
                 </div>
               </a>
             </div>
@@ -422,40 +422,40 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
 
       {/* Product Signals Tab */}
       {activeDetailTab === 'product' && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Changelog */}
           {tier3.changelog && (
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-slate-800">Release Activity</h3>
-                <div className="text-sm text-slate-500">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-900">Release Activity</h3>
+                <div className="text-sm font-medium text-gray-600">
                   {tier3.changelog.velocity.releases_last_30_days} releases (30d) •
-                  Trend: <span className={tier3.changelog.velocity.trend === 'accelerating' ? 'text-green-600' : tier3.changelog.velocity.trend === 'slowing' ? 'text-red-600' : 'text-slate-600'}>
+                  Trend: <span className={tier3.changelog.velocity.trend === 'accelerating' ? 'text-green-600 font-bold' : tier3.changelog.velocity.trend === 'slowing' ? 'text-red-600 font-bold' : 'text-gray-600'}>
                     {tier3.changelog.velocity.trend}
                   </span>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {tier3.changelog.releases.slice(0, 5).map((release, i) => (
-                  <div key={i} className="p-3 bg-white rounded-lg border border-slate-200">
+                  <div key={i} className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-slate-800">{release.title}</span>
+                      <span className="font-bold text-gray-900">{release.title}</span>
                       <div className="flex items-center gap-2">
-                        <span className={`text-xs px-2 py-0.5 rounded ${
+                        <span className={`text-xs px-2 py-1 rounded font-medium ${
                           release.type === 'major' ? 'bg-blue-100 text-blue-700' :
                           release.type === 'minor' ? 'bg-green-100 text-green-700' :
-                          'bg-slate-100 text-slate-600'
+                          'bg-gray-200 text-gray-700'
                         }`}>
                           {release.type}
                         </span>
-                        <span className="text-xs text-slate-500">{release.date}</span>
+                        <span className="text-xs font-medium text-gray-600">{release.date}</span>
                       </div>
                     </div>
                     {release.highlights.length > 0 && (
-                      <ul className="mt-2 text-sm text-slate-600">
+                      <ul className="mt-3 text-sm text-gray-700">
                         {release.highlights.slice(0, 2).map((h, j) => (
                           <li key={j} className="flex items-start gap-2">
-                            <span className="text-slate-400">•</span>
+                            <span className="text-gray-400">•</span>
                             {h}
                           </li>
                         ))}
@@ -470,29 +470,29 @@ export function Tab2Intelligence({ data }: Tab2IntelligenceProps) {
           {/* GitHub */}
           {tier3.github && (
             <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">GitHub Activity</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <div className="p-3 bg-white rounded-lg border border-slate-200 text-center">
-                  <div className="text-xl font-bold text-slate-800">{tier3.github.metrics?.stars.toLocaleString()}</div>
-                  <div className="text-xs text-slate-500">Stars</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">GitHub Activity</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm text-center">
+                  <div className="text-2xl font-bold text-gray-900">{tier3.github.metrics?.stars.toLocaleString()}</div>
+                  <div className="text-xs font-medium text-gray-600 mt-1">Stars</div>
                 </div>
-                <div className="p-3 bg-white rounded-lg border border-slate-200 text-center">
-                  <div className="text-xl font-bold text-slate-800">{tier3.github.metrics?.forks.toLocaleString()}</div>
-                  <div className="text-xs text-slate-500">Forks</div>
+                <div className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm text-center">
+                  <div className="text-2xl font-bold text-gray-900">{tier3.github.metrics?.forks.toLocaleString()}</div>
+                  <div className="text-xs font-medium text-gray-600 mt-1">Forks</div>
                 </div>
-                <div className="p-3 bg-white rounded-lg border border-slate-200 text-center">
-                  <div className="text-xl font-bold text-slate-800">{tier3.github.metrics?.open_issues}</div>
-                  <div className="text-xs text-slate-500">Open Issues</div>
+                <div className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm text-center">
+                  <div className="text-2xl font-bold text-gray-900">{tier3.github.metrics?.open_issues}</div>
+                  <div className="text-xs font-medium text-gray-600 mt-1">Open Issues</div>
                 </div>
-                <div className="p-3 bg-white rounded-lg border border-slate-200 text-center">
-                  <div className={`text-sm font-medium ${
+                <div className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm text-center">
+                  <div className={`text-base font-bold ${
                     tier3.github.metrics?.activity_level === 'very_active' ? 'text-green-600' :
                     tier3.github.metrics?.activity_level === 'active' ? 'text-blue-600' :
-                    'text-slate-600'
+                    'text-gray-600'
                   }`}>
                     {tier3.github.metrics?.activity_level.replace('_', ' ')}
                   </div>
-                  <div className="text-xs text-slate-500">Activity</div>
+                  <div className="text-xs font-medium text-gray-600 mt-1">Activity</div>
                 </div>
               </div>
 

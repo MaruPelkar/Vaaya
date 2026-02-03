@@ -10,10 +10,10 @@ export function RefreshButton({ loading, onClick }: RefreshButtonProps) {
     <button
       onClick={onClick}
       disabled={loading}
-      className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 transition-colors"
+      className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-200 text-gray-900 hover:bg-gray-300 rounded-lg disabled:opacity-50 transition-colors border border-gray-300"
     >
       <svg
-        className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
+        className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
