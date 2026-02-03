@@ -11,26 +11,117 @@ const emptyTab1Data: Tab1Data = {
   headquarters: null,
   employee_range: null,
   industry: null,
+
+  // Company Status
+  status: null,
+  acquired_by: null,
+  acquisition_date: null,
+  ipo_date: null,
+  stock_symbol: null,
+
+  // Funding
   funding: { total: null, last_round: null, last_round_date: null, investors: [] },
+  funding_rounds: [],
+
+  // Employee Trend
+  employee_count: null,
+  employee_trend: [],
+  employee_growth_rate: null,
+
+  // Acquisitions & Competitors
+  acquisitions: [],
+  competitors: [],
+
+  // Leadership & Socials
   leadership: [],
   socials: { twitter: null, linkedin: null, github: null },
   website: '',
 };
 
 const emptyTab2Data: Tab2Data = {
-  summary: '',
-  sentiment_score: 0.5,
-  loved_features: [],
-  common_complaints: [],
-  recent_releases: [],
-  press_mentions: [],
-  raw_mentions: [],
+  executive_brief: {
+    generated_at: '',
+    whats_new: {
+      summary: '',
+      releases: [],
+      time_period: 'Last 3 months',
+      total_releases_found: 0,
+    },
+    market_reaction: {
+      summary: '',
+      sentiment: { score: 50, label: 'mixed', trend: 'stable', based_on_mentions: 0 },
+      positive_themes: [],
+      negative_themes: [],
+      notable_reactions: [],
+    },
+    product_direction: {
+      summary: '',
+      confirmed_roadmap: [],
+      likely_priorities: [],
+      top_requested_features: [],
+      strategic_signals: [],
+    },
+  },
+  tier1: {
+    g2: null,
+    capterra: null,
+    trustradius: null,
+    gartner: null,
+    forrester: null,
+    linkedin: null,
+    crunchbase_news: [],
+    press_releases: [],
+    analyst_coverage: [],
+  },
+  tier2: {
+    aggregate_sentiment: { score: 50, label: 'mixed', total_mentions: 0, most_active_platform: '' },
+    reddit: null,
+    twitter: null,
+    hacker_news: null,
+    facebook: null,
+    discord: null,
+    official_community: null,
+    youtube: null,
+    product_hunt: null,
+    quora: null,
+  },
+  tier3: {
+    changelog: null,
+    help_docs: null,
+    github: null,
+    support: {
+      help_center_url: null,
+      common_issues: [],
+      support_signals: { g2_support_rating: null, response_time_claim: null, community_sentiment: 'mixed' },
+      pain_points: [],
+    },
+    api_docs: null,
+    public_roadmap: null,
+    status_page: null,
+    job_signals: {
+      total_open_roles: 0,
+      careers_url: null,
+      product_signals: [],
+      tech_investments: [],
+      team_signals: [],
+      expansion_signals: [],
+    },
+  },
 };
 
 const emptyTab3Data: Tab3Data = {
+  summary: {
+    total_users_found: 0,
+    high_confidence_count: 0,
+    medium_confidence_count: 0,
+    low_confidence_count: 0,
+    signals_collected: 0,
+    sources_searched: [],
+  },
   users: [],
-  companies_using: [],
-  total_signals_found: 0,
+  companies_identified: [],
+  collected_at: '',
+  collection_time_ms: 0,
 };
 
 export default function CompanyPage({ params }: { params: Promise<{ domain: string }> }) {

@@ -1,146 +1,108 @@
-import { Tab3Data, SignalType } from '@/lib/types';
-import { RawUserSignal } from './types';
-import { searchReviewAuthors } from './review-authors';
-import { searchTestimonials } from './testimonials';
-import { searchLinkedInMentions } from './linkedin-mentions';
-import { searchForumUsers } from './forums';
-import { searchJobPostings } from './job-postings';
-import { v4 as uuidv4 } from 'uuid';
+import { Tab3Data, RawSignal } from '@/lib/types';
+import { collectReviewSignals } from './collectors/reviews';
+import { collectLinkedInSignals } from './collectors/linkedin';
+import { collectTwitterSignals } from './collectors/twitter';
+import { collectTestimonialSignals } from './collectors/testimonials';
+import { collectGitHubSignals } from './collectors/github';
+import { collectForumSignals } from './collectors/forums';
+import { collectJobSignals } from './collectors/jobs';
+import { collectCustomerSignals } from './collectors/customers';
+import { resolveEntities } from './resolution';
 
 export async function executeTab3Strategies(
   domain: string,
   companyName: string
 ): Promise<{ data: Tab3Data; sources: string[] }> {
-  const sources: string[] = [];
-  const allSignals: RawUserSignal[] = [];
+  const startTime = Date.now();
 
-  // Gather signals in parallel
-  const [reviewsResult, testimonialsResult, linkedinResult, forumsResult, jobsResult] =
-    await Promise.allSettled([
-      searchReviewAuthors(companyName),
-      searchTestimonials(domain, companyName),
-      searchLinkedInMentions(companyName),
-      searchForumUsers(companyName),
-      searchJobPostings(companyName),
-    ]);
+  console.log('[Tab3] Starting User Discovery Engine...');
 
-  if (reviewsResult.status === 'fulfilled' && reviewsResult.value.length) {
-    sources.push('review_sites');
-    allSignals.push(...reviewsResult.value);
-  }
+  // Run all collectors in parallel
+  const results = await Promise.allSettled([
+    collectReviewSignals(companyName),
+    collectLinkedInSignals(companyName),
+    collectTwitterSignals(companyName),
+    collectTestimonialSignals(companyName, domain),
+    collectGitHubSignals(companyName),
+    collectForumSignals(companyName),
+    collectJobSignals(companyName),
+    collectCustomerSignals(companyName, domain),
+  ]);
 
-  if (testimonialsResult.status === 'fulfilled' && testimonialsResult.value.length) {
-    sources.push('testimonials');
-    allSignals.push(...testimonialsResult.value);
-  }
+  // Gather successful signals
+  let allSignals: RawSignal[] = [];
+  const sourcesSearched: string[] = [];
 
-  if (linkedinResult.status === 'fulfilled' && linkedinResult.value.length) {
-    sources.push('linkedin');
-    allSignals.push(...linkedinResult.value);
-  }
+  const collectors = [
+    'reviews',
+    'linkedin',
+    'twitter',
+    'testimonials',
+    'github',
+    'forums',
+    'jobs',
+    'customers',
+  ];
 
-  if (forumsResult.status === 'fulfilled' && forumsResult.value.length) {
-    sources.push('forums');
-    allSignals.push(...forumsResult.value);
-  }
-
-  if (jobsResult.status === 'fulfilled' && jobsResult.value.length) {
-    sources.push('job_postings');
-    allSignals.push(...jobsResult.value);
-  }
-
-  // Deduplicate and merge signals by person
-  const userMap = new Map<string, Tab3Data['users'][0]>();
-  const companiesUsing = new Set<string>();
-
-  allSignals.forEach(signal => {
-    // Create a key for deduplication (normalized name + company)
-    const key = `${signal.name.toLowerCase().trim()}-${(signal.company || '').toLowerCase().trim()}`;
-
-    if (signal.company) {
-      companiesUsing.add(signal.company);
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled' && result.value && result.value.length > 0) {
+      allSignals = allSignals.concat(result.value);
+      sourcesSearched.push(collectors[i]);
+      console.log(`[Tab3] ${collectors[i]}: ${result.value.length} signals`);
+    } else if (result.status === 'rejected') {
+      console.error(`[Tab3] ${collectors[i]} failed:`, result.reason);
     }
+  });
 
-    if (userMap.has(key)) {
-      // Add signal to existing user
-      const user = userMap.get(key)!;
-      user.signals.push({
-        type: signal.signalType,
-        confidence: signal.confidence,
-        snippet: signal.snippet,
-        url: signal.url,
-        date: signal.date || null,
-      });
-      // Update confidence score (diminishing returns formula)
-      user.confidence_score = calculateConfidence(user.signals);
-      // Update linkedin if found
-      if (signal.linkedin_url && !user.linkedin_url) {
-        user.linkedin_url = signal.linkedin_url;
+  console.log(`[Tab3] Total raw signals: ${allSignals.length}`);
+
+  // Resolve entities (dedupe and merge)
+  const users = resolveEntities(allSignals);
+
+  console.log(`[Tab3] Resolved to ${users.length} unique users`);
+
+  // Extract companies identified (from Tier 3 inferred signals)
+  const companiesMap = new Map<string, { source: string; count: number }>();
+  for (const signal of allSignals) {
+    const company = signal.extracted_company || signal.metadata?.inferred_company;
+    if (company && typeof company === 'string') {
+      const existing = companiesMap.get(company);
+      if (existing) {
+        existing.count++;
+      } else {
+        companiesMap.set(company, { source: signal.source, count: 1 });
       }
-    } else {
-      // Create new user
-      userMap.set(key, {
-        id: uuidv4(),
-        name: signal.name,
-        title: signal.title || null,
-        company: signal.company || null,
-        confidence_score: signal.confidence,
-        signals: [{
-          type: signal.signalType,
-          confidence: signal.confidence,
-          snippet: signal.snippet,
-          url: signal.url,
-          date: signal.date || null,
-        }],
-        linkedin_url: signal.linkedin_url || null,
-        email: null,
-      });
     }
-  });
+  }
 
-  // Convert to array and sort by confidence
-  const users = Array.from(userMap.values())
-    .sort((a, b) => b.confidence_score - a.confidence_score)
-    .slice(0, 100);
+  // Calculate confidence buckets
+  const highConfidence = users.filter(u => u.confidence_score >= 70).length;
+  const mediumConfidence = users.filter(u => u.confidence_score >= 40 && u.confidence_score < 70).length;
+  const lowConfidence = users.filter(u => u.confidence_score < 40).length;
 
-  return {
-    data: {
-      users,
-      companies_using: Array.from(companiesUsing).slice(0, 50),
-      total_signals_found: allSignals.length,
+  const data: Tab3Data = {
+    summary: {
+      total_users_found: users.length,
+      high_confidence_count: highConfidence,
+      medium_confidence_count: mediumConfidence,
+      low_confidence_count: lowConfidence,
+      signals_collected: allSignals.length,
+      sources_searched: sourcesSearched,
     },
-    sources,
-  };
-}
-
-// Calculate compound confidence from multiple signals
-function calculateConfidence(signals: Tab3Data['users'][0]['signals']): number {
-  const SIGNAL_WEIGHTS: Record<SignalType, number> = {
-    g2_review: 0.95,
-    capterra_review: 0.90,
-    trustradius_review: 0.90,
-    testimonial: 0.85,
-    linkedin_post: 0.85,
-    twitter_mention: 0.75,
-    reddit_post: 0.70,
-    forum_post: 0.70,
-    github_issue: 0.75,
-    stackoverflow: 0.70,
-    job_posting_inference: 0.50,
+    users,
+    companies_identified: Array.from(companiesMap.entries())
+      .map(([name, data]) => ({
+        name,
+        source: data.source,
+        signals: data.count,
+      }))
+      .sort((a, b) => b.signals - a.signals)
+      .slice(0, 50),
+    collected_at: new Date().toISOString(),
+    collection_time_ms: Date.now() - startTime,
   };
 
-  // Sort by weight descending
-  const sortedSignals = [...signals].sort(
-    (a, b) => SIGNAL_WEIGHTS[b.type] - SIGNAL_WEIGHTS[a.type]
-  );
+  console.log(`[Tab3] Complete in ${data.collection_time_ms}ms. Sources: ${sourcesSearched.join(', ')}`);
 
-  // Compound with diminishing returns
-  let total = 0;
-  sortedSignals.forEach((signal, index) => {
-    const weight = SIGNAL_WEIGHTS[signal.type];
-    const diminishingFactor = Math.pow(0.7, index);
-    total = total + (1 - total) * weight * diminishingFactor;
-  });
-
-  return Math.min(total, 0.99);
+  return { data, sources: sourcesSearched };
 }
