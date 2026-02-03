@@ -270,12 +270,12 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto py-8 px-4">
+    <main className="min-h-screen bg-gray-100">
+      <div className="max-w-6xl mx-auto py-12 px-4">
         {/* Back button */}
         <button
           onClick={() => router.push('/')}
-          className="text-sm text-gray-500 hover:text-gray-700 mb-6 flex items-center gap-1"
+          className="text-sm text-gray-500 hover:text-gray-700 mb-8 flex items-center gap-1"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -284,20 +284,20 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
         </button>
 
         {/* Company Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-6 mb-12">
           {data.company.logo_url && (
             <img
               src={data.company.logo_url}
               alt={data.company.name}
-              className="w-16 h-16 rounded-lg bg-gray-100"
+              className="w-20 h-20 rounded-lg bg-white"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
           )}
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{data.company.name}</h1>
-            <p className="text-gray-500">{data.company.domain}</p>
+            <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">{data.company.name}</h1>
+            <p className="text-lg text-gray-500 font-mono">{data.company.domain}</p>
           </div>
         </div>
 

@@ -34,40 +34,40 @@ export function Tab3Users({ data }: Tab3UsersProps) {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Summary Stats */}
-      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-100">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-purple-900">User Discovery</h2>
-          <span className="text-xs text-purple-500">
+      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-8 border border-purple-200">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-bold text-gray-900">User Discovery</h2>
+          <span className="text-xs uppercase tracking-wide font-medium text-purple-600">
             {data.summary.signals_collected} signals collected
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <div className="text-3xl font-bold text-purple-700">{data.summary.total_users_found}</div>
-            <div className="text-sm text-purple-600">Total Users</div>
+        <div className="grid grid-cols-4 gap-6">
+          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-purple-200">
+            <div className="text-5xl font-bold text-purple-700">{data.summary.total_users_found}</div>
+            <div className="text-sm font-medium text-purple-600 mt-2">Total Users</div>
           </div>
-          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <div className="text-3xl font-bold text-emerald-600">{data.summary.high_confidence_count}</div>
-            <div className="text-sm text-emerald-500">High Confidence</div>
+          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-emerald-200">
+            <div className="text-5xl font-bold text-emerald-600">{data.summary.high_confidence_count}</div>
+            <div className="text-sm font-medium text-emerald-600 mt-2">High Confidence</div>
           </div>
-          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <div className="text-3xl font-bold text-amber-600">{data.summary.medium_confidence_count}</div>
-            <div className="text-sm text-amber-500">Medium</div>
+          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-amber-200">
+            <div className="text-5xl font-bold text-amber-600">{data.summary.medium_confidence_count}</div>
+            <div className="text-sm font-medium text-amber-600 mt-2">Medium</div>
           </div>
-          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <div className="text-3xl font-bold text-gray-400">{data.summary.low_confidence_count}</div>
-            <div className="text-sm text-gray-400">Low</div>
+          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-300">
+            <div className="text-5xl font-bold text-gray-600">{data.summary.low_confidence_count}</div>
+            <div className="text-sm font-medium text-gray-600 mt-2">Low</div>
           </div>
         </div>
 
         {data.summary.sources_searched.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="text-xs text-purple-600">Sources:</span>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <span className="text-xs uppercase tracking-wide font-medium text-purple-700">Sources:</span>
             {data.summary.sources_searched.map((source, i) => (
-              <span key={i} className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded">
+              <span key={i} className="text-xs px-3 py-1.5 bg-purple-100 text-purple-800 rounded-full font-medium">
                 {source}
               </span>
             ))}
@@ -76,11 +76,11 @@ export function Tab3Users({ data }: Tab3UsersProps) {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4 px-2">
+      <div className="flex items-center gap-6 px-2">
         <select
           value={filter}
           onChange={e => setFilter(e.target.value as ConfidenceFilter)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="text-sm font-medium border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         >
           <option value="all">All confidence levels</option>
           <option value="high">High (70+)</option>
@@ -88,7 +88,7 @@ export function Tab3Users({ data }: Tab3UsersProps) {
           <option value="low">Low (&lt;40)</option>
         </select>
 
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
           <input
             type="checkbox"
             checked={hasLinkedIn}
@@ -100,13 +100,13 @@ export function Tab3Users({ data }: Tab3UsersProps) {
 
         <div className="flex-1" />
 
-        <span className="text-sm text-gray-500">
+        <span className="text-sm font-medium text-gray-600">
           Showing {filteredUsers.length} of {data.users.length} users
         </span>
       </div>
 
       {/* User List */}
-      <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+      <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-md">
         {filteredUsers.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             No users match the current filters
@@ -133,16 +133,16 @@ export function Tab3Users({ data }: Tab3UsersProps) {
 
       {/* Companies Identified */}
       {data.companies_identified.length > 0 && (
-        <div className="border border-gray-200 rounded-xl bg-white">
+        <div className="border border-gray-300 rounded-xl bg-white shadow-md">
           <button
             onClick={() => setShowCompanies(!showCompanies)}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-8 py-5 flex items-center justify-between hover:bg-gray-50 transition-colors"
           >
-            <span className="font-semibold text-gray-900">
+            <span className="font-bold text-gray-900 text-lg">
               Companies Identified ({data.companies_identified.length})
             </span>
             <svg
-              className={`w-5 h-5 text-gray-400 transition-transform ${showCompanies ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 text-gray-600 transition-transform ${showCompanies ? 'rotate-180' : ''}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -152,16 +152,16 @@ export function Tab3Users({ data }: Tab3UsersProps) {
           </button>
 
           {showCompanies && (
-            <div className="px-6 pb-4">
-              <div className="flex flex-wrap gap-2">
+            <div className="px-8 pb-6">
+              <div className="flex flex-wrap gap-3">
                 {data.companies_identified.slice(0, 30).map((company, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm"
+                    className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded-full text-sm font-medium"
                     title={`${company.signals} signal(s) from ${company.source}`}
                   >
                     {company.name}
-                    <span className="ml-1 text-gray-400 text-xs">({company.signals})</span>
+                    <span className="ml-1 text-gray-600 text-xs">({company.signals})</span>
                   </span>
                 ))}
               </div>
@@ -184,41 +184,41 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
   const scoreColor =
     user.confidence_score >= 70 ? 'text-emerald-600' :
     user.confidence_score >= 40 ? 'text-amber-600' :
-    'text-gray-400';
+    'text-gray-600';
 
   return (
     <div
-      className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 transition-colors"
+      className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
     >
       {/* Main row */}
       <div
-        className="py-3 px-4 cursor-pointer"
+        className="py-4 px-6 cursor-pointer"
         onClick={onToggle}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {/* Score */}
-          <div className={`font-mono text-sm font-bold w-10 ${scoreColor}`}>
+          <div className={`font-mono text-lg font-bold w-10 ${scoreColor}`}>
             {user.confidence_score}
           </div>
 
           {/* Avatar */}
-          <div className="w-9 h-9 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center text-purple-700 font-semibold text-sm flex-shrink-0">
+          <div className="w-11 h-11 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center text-purple-700 font-bold text-base flex-shrink-0">
             {user.name.charAt(0).toUpperCase()}
           </div>
 
           {/* Name + Role */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-2">
-              <span className="font-medium text-gray-900 truncate">
+            <div className="flex items-baseline gap-3">
+              <span className="font-semibold text-gray-900 truncate text-base">
                 {user.name}
               </span>
               {user.role && user.company && (
-                <span className="text-sm text-gray-500 truncate">
+                <span className="text-base text-gray-600 truncate">
                   {user.role} @ {user.company}
                 </span>
               )}
               {!user.role && user.company && (
-                <span className="text-sm text-gray-500 truncate">
+                <span className="text-base text-gray-600 truncate">
                   @ {user.company}
                 </span>
               )}
@@ -304,27 +304,27 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
         </div>
 
         {/* Top signal preview */}
-        <div className="ml-[76px] mt-1 flex items-start text-sm">
-          <span className="text-gray-300 mr-1.5">└</span>
-          <span className="text-gray-400 mr-1">{formatSource(user.strongest_signal)}:</span>
-          <span className="text-gray-600 truncate">{user.signals[0]?.text}</span>
+        <div className="ml-20 mt-2 flex items-start text-sm">
+          <span className="text-gray-400 mr-2">└</span>
+          <span className="text-gray-600 font-medium mr-1">{formatSource(user.strongest_signal)}:</span>
+          <span className="text-gray-700 truncate">{user.signals[0]?.text}</span>
         </div>
       </div>
 
       {/* Expanded signals */}
       {expanded && user.signals.length > 1 && (
-        <div className="ml-[76px] px-4 pb-3 space-y-1">
+        <div className="ml-20 px-6 pb-4 space-y-2">
           {user.signals.slice(1).map((signal, i) => (
             <div key={i} className="flex items-start text-sm">
-              <span className="text-gray-300 mr-1.5">{i === user.signals.length - 2 ? '└' : '├'}</span>
-              <span className="text-gray-400 mr-1">{formatSource(signal.source)}:</span>
-              <span className="text-gray-500 truncate flex-1">{signal.text}</span>
+              <span className="text-gray-400 mr-2">{i === user.signals.length - 2 ? '└' : '├'}</span>
+              <span className="text-gray-600 font-medium mr-1">{formatSource(signal.source)}:</span>
+              <span className="text-gray-700 truncate flex-1">{signal.text}</span>
               {signal.url && (
                 <a
                   href={signal.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-2 text-purple-500 hover:underline text-xs"
+                  className="ml-2 text-purple-600 hover:underline text-xs font-medium"
                 >
                   view
                 </a>
