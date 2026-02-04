@@ -1,26 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Commissioner:wght@300;400;500;600;700&display=swap');
+
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --vaaya-brand: #073B39;
+  --vaaya-brand-light: #0a524f;
+  --vaaya-white: #FAFAFA;
+  --vaaya-neutral: #F5F5F5;
+  --vaaya-border: #E5E5E5;
+  --vaaya-text: #1A1A1A;
+  --vaaya-text-muted: #666666;
+  --background: var(--vaaya-white);
+  --foreground: var(--vaaya-text);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-vaaya-brand: var(--vaaya-brand);
+  --color-vaaya-brand-light: var(--vaaya-brand-light);
+  --font-sans: 'Commissioner', sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-family: 'Commissioner', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--vaaya-white);
+  color: var(--vaaya-text);
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--vaaya-brand);
+  color: white;
+}
+
+/* Font utilities */
+.font-display {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-body {
+  font-family: 'Commissioner', sans-serif;
+}
+
+/* Typography utilities */
+.headline-display {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 500;
+  font-style: italic;
+  font-size: 72px;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.text-body {
+  font-family: 'Commissioner', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  line-height: 28px;
+}
+
+/* Bento box container */
+.bento-box {
+  border: 1px solid var(--vaaya-border);
+  background: var(--vaaya-white);
+}
+
+/* Glass Button Styles */
+.btn-glass-primary,
+.btn-glass-secondary {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: white;
+  font-family: 'Commissioner', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  line-height: 28px;
+  padding: 16px 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-glass-primary:hover,
+.btn-glass-secondary:hover {
+  background: rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Hero section specific */
+.hero-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Brand color utilities */
+.bg-vaaya-brand {
+  background-color: var(--vaaya-brand);
+}
+
+.bg-vaaya-brand-light {
+  background-color: var(--vaaya-brand-light);
+}
+
+.text-vaaya-brand {
+  color: var(--vaaya-brand);
+}
+
+.text-vaaya-muted {
+  color: var(--vaaya-text-muted);
+}
+
+.border-vaaya {
+  border-color: var(--vaaya-border);
 }

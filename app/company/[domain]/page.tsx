@@ -244,10 +244,13 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--vaaya-white)' }}>
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading company data...</p>
+          <div
+            className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+          />
+          <p style={{ color: 'var(--vaaya-text-muted)' }}>Loading company data...</p>
         </div>
       </div>
     );
@@ -255,12 +258,13 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--vaaya-white)' }}>
         <div className="text-center">
-          <p className="text-gray-500 mb-4">Company not found</p>
+          <p className="mb-4" style={{ color: 'var(--vaaya-text-muted)' }}>Company not found</p>
           <button
             onClick={() => router.push('/')}
-            className="text-blue-500 hover:underline"
+            className="hover:underline"
+            style={{ color: 'var(--vaaya-brand)' }}
           >
             Go back to search
           </button>
@@ -270,12 +274,15 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
   }
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen" style={{ backgroundColor: 'var(--vaaya-white)' }}>
       <div className="max-w-6xl mx-auto py-12 px-4">
         {/* Back button */}
         <button
           onClick={() => router.push('/')}
-          className="text-sm text-gray-500 hover:text-gray-700 mb-8 flex items-center gap-1"
+          className="text-sm mb-8 flex items-center gap-1 transition-colors"
+          style={{ color: 'var(--vaaya-text-muted)' }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--vaaya-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--vaaya-text-muted)'}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -289,15 +296,18 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
             <img
               src={data.company.logo_url}
               alt={data.company.name}
-              className="w-20 h-20 rounded-lg bg-white"
+              className="w-20 h-20 rounded-lg"
+              style={{ backgroundColor: 'var(--vaaya-white)' }}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
           )}
           <div>
-            <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">{data.company.name}</h1>
-            <p className="text-lg text-gray-500 font-mono">{data.company.domain}</p>
+            <h1 className="font-display text-5xl font-semibold tracking-tight leading-tight" style={{ color: 'var(--vaaya-text)' }}>
+              {data.company.name}
+            </h1>
+            <p className="text-lg font-mono" style={{ color: 'var(--vaaya-text-muted)' }}>{data.company.domain}</p>
           </div>
         </div>
 

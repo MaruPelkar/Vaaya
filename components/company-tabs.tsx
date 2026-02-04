@@ -38,30 +38,52 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
   return (
     <div>
       {/* Tab Headers */}
-      <div className="flex border-b border-gray-300 mb-8">
+      <div className="flex mb-8" style={{ borderBottom: '1px solid var(--vaaya-border)' }}>
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-6 py-3 text-base font-semibold border-b-2 -mb-px transition-colors ${
-              activeTab === tab.id
-                ? 'border-gray-900 text-gray-900'
-                : 'border-transparent text-gray-500 hover:text-gray-900'
-            }`}
+            className="px-6 py-3 text-base font-semibold -mb-px transition-colors"
+            style={{
+              borderBottom: activeTab === tab.id ? '2px solid var(--vaaya-brand)' : '2px solid transparent',
+              color: activeTab === tab.id ? 'var(--vaaya-brand)' : 'var(--vaaya-text-muted)',
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== tab.id) {
+                e.currentTarget.style.color = 'var(--vaaya-text)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== tab.id) {
+                e.currentTarget.style.color = 'var(--vaaya-text-muted)';
+              }
+            }}
           >
             {tab.label}
             {tabsLoading[tab.id] && (
-              <span className="ml-2 inline-block w-3 h-3 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+              <span
+                className="ml-2 inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+              />
             )}
           </button>
         ))}
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-300">
+      <div
+        className="bento-box rounded-xl shadow-md"
+        style={{
+          backgroundColor: 'var(--vaaya-white)',
+          border: '1px solid var(--vaaya-border)',
+        }}
+      >
         {/* Refresh Header */}
-        <div className="flex items-center justify-between px-8 py-4 border-b border-gray-200">
-          <div className="text-xs uppercase tracking-wide font-medium text-gray-500">
+        <div
+          className="flex items-center justify-between px-8 py-4"
+          style={{ borderBottom: '1px solid var(--vaaya-border)' }}
+        >
+          <div className="text-xs uppercase tracking-wide font-medium" style={{ color: 'var(--vaaya-text-muted)' }}>
             {tabData.updated_at ? (
               <>Last updated: {new Date(tabData.updated_at).toLocaleString()}</>
             ) : tabsLoading[activeTab] ? (
@@ -81,8 +103,11 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
           {tabsLoading[activeTab] && !tabData.updated_at ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-gray-500">Fetching data...</p>
+                <div
+                  className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+                  style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+                />
+                <p style={{ color: 'var(--vaaya-text-muted)' }}>Fetching data...</p>
               </div>
             </div>
           ) : (
