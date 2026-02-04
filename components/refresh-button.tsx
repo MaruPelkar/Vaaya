@@ -10,7 +10,20 @@ export function RefreshButton({ loading, onClick }: RefreshButtonProps) {
     <button
       onClick={onClick}
       disabled={loading}
-      className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-200 text-gray-900 hover:bg-gray-300 rounded-lg disabled:opacity-50 transition-colors border border-gray-300"
+      className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
+      style={{
+        backgroundColor: 'var(--vaaya-neutral)',
+        color: 'var(--vaaya-text)',
+        border: '1px solid var(--vaaya-border)',
+      }}
+      onMouseEnter={(e) => {
+        if (!loading) {
+          e.currentTarget.style.backgroundColor = 'var(--vaaya-border)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--vaaya-neutral)';
+      }}
     >
       <svg
         className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}

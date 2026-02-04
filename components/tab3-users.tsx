@@ -19,8 +19,8 @@ export function Tab3Users({ data }: Tab3UsersProps) {
   if (!data || !data.summary) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 mb-4">Data is in an older format. Please refresh to load new data.</p>
-        <p className="text-sm text-gray-400">Click the refresh button above to fetch updated user discovery.</p>
+        <p className="mb-4" style={{ color: 'var(--vaaya-text-muted)' }}>Data is in an older format. Please refresh to load new data.</p>
+        <p className="text-sm" style={{ color: 'var(--vaaya-text-muted)' }}>Click the refresh button above to fetch updated user discovery.</p>
       </div>
     );
   }
@@ -36,38 +36,38 @@ export function Tab3Users({ data }: Tab3UsersProps) {
   return (
     <div className="space-y-8">
       {/* Summary Stats */}
-      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-8 border border-purple-200">
+      <div className="rounded-xl p-8" style={{ backgroundColor: 'rgba(7, 59, 57, 0.05)', border: '1px solid rgba(7, 59, 57, 0.2)' }}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-gray-900">User Discovery</h2>
-          <span className="text-xs uppercase tracking-wide font-medium text-purple-600">
+          <h2 className="font-display text-3xl font-semibold" style={{ color: 'var(--vaaya-text)' }}>User Discovery</h2>
+          <span className="text-xs uppercase tracking-wide font-medium" style={{ color: 'var(--vaaya-brand)' }}>
             {data.summary.signals_collected} signals collected
           </span>
         </div>
 
         <div className="grid grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-purple-200">
-            <div className="text-5xl font-bold text-purple-700">{data.summary.total_users_found}</div>
-            <div className="text-sm font-medium text-purple-600 mt-2">Total Users</div>
+          <div className="bento-box rounded-lg p-6 text-center shadow-sm" style={{ borderColor: 'var(--vaaya-brand)' }}>
+            <div className="text-5xl font-bold" style={{ color: 'var(--vaaya-brand)' }}>{data.summary.total_users_found}</div>
+            <div className="text-sm font-medium mt-2" style={{ color: 'var(--vaaya-brand-light)' }}>Total Users</div>
           </div>
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-emerald-200">
+          <div className="bento-box rounded-lg p-6 text-center shadow-sm" style={{ borderColor: '#10B981' }}>
             <div className="text-5xl font-bold text-emerald-600">{data.summary.high_confidence_count}</div>
             <div className="text-sm font-medium text-emerald-600 mt-2">High Confidence</div>
           </div>
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-amber-200">
+          <div className="bento-box rounded-lg p-6 text-center shadow-sm" style={{ borderColor: '#F59E0B' }}>
             <div className="text-5xl font-bold text-amber-600">{data.summary.medium_confidence_count}</div>
             <div className="text-sm font-medium text-amber-600 mt-2">Medium</div>
           </div>
-          <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-300">
-            <div className="text-5xl font-bold text-gray-600">{data.summary.low_confidence_count}</div>
-            <div className="text-sm font-medium text-gray-600 mt-2">Low</div>
+          <div className="bento-box rounded-lg p-6 text-center shadow-sm">
+            <div className="text-5xl font-bold" style={{ color: 'var(--vaaya-text-muted)' }}>{data.summary.low_confidence_count}</div>
+            <div className="text-sm font-medium mt-2" style={{ color: 'var(--vaaya-text-muted)' }}>Low</div>
           </div>
         </div>
 
         {data.summary.sources_searched.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-3">
-            <span className="text-xs uppercase tracking-wide font-medium text-purple-700">Sources:</span>
+            <span className="text-xs uppercase tracking-wide font-medium" style={{ color: 'var(--vaaya-brand)' }}>Sources:</span>
             {data.summary.sources_searched.map((source, i) => (
-              <span key={i} className="text-xs px-3 py-1.5 bg-purple-100 text-purple-800 rounded-full font-medium">
+              <span key={i} className="text-xs px-3 py-1.5 rounded-full font-medium" style={{ backgroundColor: 'rgba(7, 59, 57, 0.1)', color: 'var(--vaaya-brand)' }}>
                 {source}
               </span>
             ))}
@@ -80,7 +80,12 @@ export function Tab3Users({ data }: Tab3UsersProps) {
         <select
           value={filter}
           onChange={e => setFilter(e.target.value as ConfidenceFilter)}
-          className="text-sm font-medium border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="text-sm font-medium rounded-lg px-3 py-2 focus:outline-none"
+          style={{
+            backgroundColor: 'var(--vaaya-white)',
+            border: '1px solid var(--vaaya-border)',
+            color: 'var(--vaaya-text)',
+          }}
         >
           <option value="all">All confidence levels</option>
           <option value="high">High (70+)</option>
@@ -88,27 +93,28 @@ export function Tab3Users({ data }: Tab3UsersProps) {
           <option value="low">Low (&lt;40)</option>
         </select>
 
-        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+        <label className="flex items-center gap-2 text-sm font-medium cursor-pointer" style={{ color: 'var(--vaaya-text-muted)' }}>
           <input
             type="checkbox"
             checked={hasLinkedIn}
             onChange={e => setHasLinkedIn(e.target.checked)}
-            className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+            className="rounded"
+            style={{ borderColor: 'var(--vaaya-border)', accentColor: 'var(--vaaya-brand)' }}
           />
           Has LinkedIn
         </label>
 
         <div className="flex-1" />
 
-        <span className="text-sm font-medium text-gray-600">
+        <span className="text-sm font-medium" style={{ color: 'var(--vaaya-text-muted)' }}>
           Showing {filteredUsers.length} of {data.users.length} users
         </span>
       </div>
 
       {/* User List */}
-      <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-md">
+      <div className="bento-box rounded-xl overflow-hidden shadow-md">
         {filteredUsers.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center" style={{ color: 'var(--vaaya-text-muted)' }}>
             No users match the current filters
           </div>
         ) : (
@@ -125,7 +131,7 @@ export function Tab3Users({ data }: Tab3UsersProps) {
 
       {filteredUsers.length > 50 && (
         <div className="text-center py-4">
-          <button className="text-purple-600 text-sm hover:underline">
+          <button className="text-sm hover:underline" style={{ color: 'var(--vaaya-brand)' }}>
             Load more ({filteredUsers.length - 50} remaining)
           </button>
         </div>
@@ -133,16 +139,18 @@ export function Tab3Users({ data }: Tab3UsersProps) {
 
       {/* Companies Identified */}
       {data.companies_identified.length > 0 && (
-        <div className="border border-gray-300 rounded-xl bg-white shadow-md">
+        <div className="bento-box rounded-xl shadow-md">
           <button
             onClick={() => setShowCompanies(!showCompanies)}
-            className="w-full px-8 py-5 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-8 py-5 flex items-center justify-between transition-colors"
+            style={{ backgroundColor: showCompanies ? 'var(--vaaya-neutral)' : 'var(--vaaya-white)' }}
           >
-            <span className="font-bold text-gray-900 text-lg">
+            <span className="font-bold text-lg" style={{ color: 'var(--vaaya-text)' }}>
               Companies Identified ({data.companies_identified.length})
             </span>
             <svg
-              className={`w-5 h-5 text-gray-600 transition-transform ${showCompanies ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 transition-transform ${showCompanies ? 'rotate-180' : ''}`}
+              style={{ color: 'var(--vaaya-text-muted)' }}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -157,11 +165,12 @@ export function Tab3Users({ data }: Tab3UsersProps) {
                 {data.companies_identified.slice(0, 30).map((company, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded-full text-sm font-medium"
+                    className="px-3 py-1.5 rounded-full text-sm font-medium"
+                    style={{ backgroundColor: 'var(--vaaya-neutral)', color: 'var(--vaaya-text)' }}
                     title={`${company.signals} signal(s) from ${company.source}`}
                   >
                     {company.name}
-                    <span className="ml-1 text-gray-600 text-xs">({company.signals})</span>
+                    <span className="ml-1 text-xs" style={{ color: 'var(--vaaya-text-muted)' }}>({company.signals})</span>
                   </span>
                 ))}
               </div>
@@ -182,43 +191,49 @@ interface UserRowProps {
 
 function UserRow({ user, expanded, onToggle }: UserRowProps) {
   const scoreColor =
-    user.confidence_score >= 70 ? 'text-emerald-600' :
-    user.confidence_score >= 40 ? 'text-amber-600' :
-    'text-gray-600';
+    user.confidence_score >= 70 ? '#10B981' :
+    user.confidence_score >= 40 ? '#F59E0B' :
+    'var(--vaaya-text-muted)';
 
   return (
     <div
-      className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
+      className="transition-colors"
+      style={{ borderBottom: '1px solid var(--vaaya-border)' }}
     >
       {/* Main row */}
       <div
         className="py-4 px-6 cursor-pointer"
         onClick={onToggle}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--vaaya-neutral)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--vaaya-white)'}
       >
         <div className="flex items-center gap-4">
           {/* Score */}
-          <div className={`font-mono text-lg font-bold w-10 ${scoreColor}`}>
+          <div className="font-mono text-lg font-bold w-10" style={{ color: scoreColor }}>
             {user.confidence_score}
           </div>
 
           {/* Avatar */}
-          <div className="w-11 h-11 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center text-purple-700 font-bold text-base flex-shrink-0">
+          <div
+            className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-base flex-shrink-0"
+            style={{ backgroundColor: 'rgba(7, 59, 57, 0.1)', color: 'var(--vaaya-brand)' }}
+          >
             {user.name.charAt(0).toUpperCase()}
           </div>
 
           {/* Name + Role */}
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-3">
-              <span className="font-semibold text-gray-900 truncate text-base">
+              <span className="font-semibold truncate text-base" style={{ color: 'var(--vaaya-text)' }}>
                 {user.name}
               </span>
               {user.role && user.company && (
-                <span className="text-base text-gray-600 truncate">
+                <span className="text-base truncate" style={{ color: 'var(--vaaya-text-muted)' }}>
                   {user.role} @ {user.company}
                 </span>
               )}
               {!user.role && user.company && (
-                <span className="text-base text-gray-600 truncate">
+                <span className="text-base truncate" style={{ color: 'var(--vaaya-text-muted)' }}>
                   @ {user.company}
                 </span>
               )}
@@ -228,7 +243,7 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
           {/* Signal badges */}
           <div className="flex items-center gap-1">
             {getUniqueSourceIcons(user.signals).map((icon, i) => (
-              <span key={i} className="text-xs text-gray-400" title={icon.title}>
+              <span key={i} className="text-xs" style={{ color: 'var(--vaaya-text-muted)' }} title={icon.title}>
                 {icon.icon}
               </span>
             ))}
@@ -241,7 +256,8 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
                 href={user.linkedin_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--vaaya-brand)' }}
                 onClick={e => e.stopPropagation()}
                 title="LinkedIn"
               >
@@ -255,7 +271,8 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
                 href={`https://twitter.com/${user.twitter_handle.replace('@', '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--vaaya-text-muted)' }}
                 onClick={e => e.stopPropagation()}
                 title="Twitter"
               >
@@ -269,7 +286,8 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
                 href={`https://github.com/${user.github_username}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--vaaya-text-muted)' }}
                 onClick={e => e.stopPropagation()}
                 title="GitHub"
               >
@@ -281,7 +299,8 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
             {user.email && (
               <a
                 href={`mailto:${user.email}`}
-                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--vaaya-text-muted)' }}
                 onClick={e => e.stopPropagation()}
                 title="Email"
               >
@@ -294,7 +313,8 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
 
           {/* Expand indicator */}
           <svg
-            className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            style={{ color: 'var(--vaaya-text-muted)' }}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -305,9 +325,9 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
 
         {/* Top signal preview */}
         <div className="ml-20 mt-2 flex items-start text-sm">
-          <span className="text-gray-400 mr-2">└</span>
-          <span className="text-gray-600 font-medium mr-1">{formatSource(user.strongest_signal)}:</span>
-          <span className="text-gray-700 truncate">{user.signals[0]?.text}</span>
+          <span style={{ color: 'var(--vaaya-text-muted)' }} className="mr-2">└</span>
+          <span className="font-medium mr-1" style={{ color: 'var(--vaaya-text-muted)' }}>{formatSource(user.strongest_signal)}:</span>
+          <span className="truncate" style={{ color: 'var(--vaaya-text-muted)' }}>{user.signals[0]?.text}</span>
         </div>
       </div>
 
@@ -316,15 +336,16 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
         <div className="ml-20 px-6 pb-4 space-y-2">
           {user.signals.slice(1).map((signal, i) => (
             <div key={i} className="flex items-start text-sm">
-              <span className="text-gray-400 mr-2">{i === user.signals.length - 2 ? '└' : '├'}</span>
-              <span className="text-gray-600 font-medium mr-1">{formatSource(signal.source)}:</span>
-              <span className="text-gray-700 truncate flex-1">{signal.text}</span>
+              <span style={{ color: 'var(--vaaya-text-muted)' }} className="mr-2">{i === user.signals.length - 2 ? '└' : '├'}</span>
+              <span className="font-medium mr-1" style={{ color: 'var(--vaaya-text-muted)' }}>{formatSource(signal.source)}:</span>
+              <span className="truncate flex-1" style={{ color: 'var(--vaaya-text-muted)' }}>{signal.text}</span>
               {signal.url && (
                 <a
                   href={signal.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-2 text-purple-600 hover:underline text-xs font-medium"
+                  className="ml-2 text-xs font-medium hover:underline"
+                  style={{ color: 'var(--vaaya-brand)' }}
                 >
                   view
                 </a>
@@ -340,19 +361,19 @@ function UserRow({ user, expanded, onToggle }: UserRowProps) {
 // Helper functions
 function getUniqueSourceIcons(signals: DiscoveredUser['signals']): Array<{ icon: string; title: string }> {
   const sourceIcons: Record<string, { icon: string; title: string }> = {
-    g2_review: { icon: '⭐', title: 'G2 Review' },
-    capterra_review: { icon: '⭐', title: 'Capterra Review' },
-    trustradius_review: { icon: '⭐', title: 'TrustRadius Review' },
+    g2_review: { icon: '★', title: 'G2 Review' },
+    capterra_review: { icon: '★', title: 'Capterra Review' },
+    trustradius_review: { icon: '★', title: 'TrustRadius Review' },
     linkedin_post: { icon: 'in', title: 'LinkedIn' },
     twitter_post: { icon: '𝕏', title: 'Twitter' },
-    github_issue: { icon: '🐙', title: 'GitHub' },
-    github_contributor: { icon: '🐙', title: 'GitHub Contributor' },
-    reddit_post: { icon: '🔴', title: 'Reddit' },
+    github_issue: { icon: '⌘', title: 'GitHub' },
+    github_contributor: { icon: '⌘', title: 'GitHub Contributor' },
+    reddit_post: { icon: '●', title: 'Reddit' },
     hn_comment: { icon: 'Y', title: 'Hacker News' },
-    testimonial: { icon: '💬', title: 'Testimonial' },
-    case_study: { icon: '📋', title: 'Case Study' },
-    job_posting: { icon: '💼', title: 'Job Posting' },
-    logo_wall: { icon: '🏢', title: 'Customer' },
+    testimonial: { icon: '❝', title: 'Testimonial' },
+    case_study: { icon: '◆', title: 'Case Study' },
+    job_posting: { icon: '◉', title: 'Job Posting' },
+    logo_wall: { icon: '▣', title: 'Customer' },
   };
 
   const seen = new Set<string>();
