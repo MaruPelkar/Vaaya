@@ -780,3 +780,37 @@ export type StreamEvent =
   | { type: 'all_complete' }
   | { type: 'company_info'; name: string; logo_url: string | null }
   | { type: 'error'; message: string };
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CSV UPLOAD & BOLNA AI INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface CSVRow {
+  sno: string;
+  name: string;
+  software: string;
+  phone_number: string;
+}
+
+export interface BolnaCallRequest {
+  agent_id: string;
+  recipient_phone_number: string;
+  user_data?: {
+    name: string;
+    software: string;
+  };
+}
+
+export interface BolnaCallResponse {
+  call_id: string;
+  status: 'initiated' | 'in_progress' | 'completed' | 'failed';
+  message?: string;
+  error?: string;
+}
+
+export interface CSVProcessingResult {
+  row: CSVRow;
+  bolna_response: BolnaCallResponse;
+  success: boolean;
+  error?: string;
+}
