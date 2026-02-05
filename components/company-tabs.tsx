@@ -1,35 +1,38 @@
 'use client';
 
 import { useState } from 'react';
-import { CompanyResponse } from '@/lib/types';
-import { Tab1Overview } from './tab1-overview';
-import { Tab2Intelligence } from './tab2-intelligence';
-import { Tab3Users } from './tab3-users';
+import { CompanyResponse, TabId } from '@/lib/types';
+import { SummaryTab } from './tabs/summary-tab';
+import { ProductTab } from './tabs/product-tab';
+import { BusinessTab } from './tabs/business-tab';
 import { RefreshButton } from './refresh-button';
 
 interface CompanyTabsProps {
   data: CompanyResponse;
-  tabsLoading: { 1: boolean; 2: boolean; 3: boolean };
-  onRefresh: (tab: 1 | 2 | 3) => void;
+  tabsLoading: Record<TabId, boolean>;
+  onRefresh: (tab: TabId) => void;
 }
 
-export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) {
-  const [activeTab, setActiveTab] = useState<1 | 2 | 3>(1);
+const TAB_CONFIG = [
+  { id: 'summary' as const, label: 'Summary', subtitle: 'Should I dig deeper?' },
+  { id: 'product' as const, label: 'Product', subtitle: 'How it works' },
+  { id: 'business' as const, label: 'Business', subtitle: 'Can they win?' },
+  { id: 'people' as const, label: 'People', subtitle: 'Who uses it?' },
+];
 
-  const tabs = [
-    { id: 1 as const, label: 'Overview', updated: data.tab1.updated_at },
-    { id: 2 as const, label: 'Market Intelligence', updated: data.tab2.updated_at },
-    { id: 3 as const, label: 'User Discovery', updated: data.tab3.updated_at },
-  ];
+export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) {
+  const [activeTab, setActiveTab] = useState<TabId>('summary');
 
   const getTabData = () => {
     switch (activeTab) {
-      case 1:
-        return data.tab1;
-      case 2:
-        return data.tab2;
-      case 3:
-        return data.tab3;
+      case 'summary':
+        return data.summary;
+      case 'product':
+        return data.product;
+      case 'business':
+        return data.business;
+      case 'people':
+        return data.people;
     }
   };
 
@@ -39,33 +42,49 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
     <div>
       {/* Tab Headers */}
       <div className="flex mb-8" style={{ borderBottom: '1px solid var(--vaaya-border)' }}>
-        {tabs.map(tab => (
+        {TAB_CONFIG.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className="px-6 py-3 text-base font-semibold -mb-px transition-colors"
+            className="px-6 py-3 -mb-px transition-colors"
             style={{
               borderBottom: activeTab === tab.id ? '2px solid var(--vaaya-brand)' : '2px solid transparent',
-              color: activeTab === tab.id ? 'var(--vaaya-brand)' : 'var(--vaaya-text-muted)',
             }}
             onMouseEnter={(e) => {
               if (activeTab !== tab.id) {
-                e.currentTarget.style.color = 'var(--vaaya-text)';
+                const label = e.currentTarget.querySelector('.tab-label') as HTMLElement;
+                if (label) label.style.color = 'var(--vaaya-text)';
               }
             }}
             onMouseLeave={(e) => {
               if (activeTab !== tab.id) {
-                e.currentTarget.style.color = 'var(--vaaya-text-muted)';
+                const label = e.currentTarget.querySelector('.tab-label') as HTMLElement;
+                if (label) label.style.color = 'var(--vaaya-text-muted)';
               }
             }}
           >
-            {tab.label}
-            {tabsLoading[tab.id] && (
-              <span
-                className="ml-2 inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-                style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
-              />
-            )}
+            <div className="text-left">
+              <div
+                className="tab-label text-base font-semibold transition-colors"
+                style={{
+                  color: activeTab === tab.id ? 'var(--vaaya-brand)' : 'var(--vaaya-text-muted)',
+                }}
+              >
+                {tab.label}
+                {tabsLoading[tab.id] && (
+                  <span
+                    className="ml-2 inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                    style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+                  />
+                )}
+              </div>
+              <div
+                className="text-xs mt-0.5"
+                style={{ color: 'var(--vaaya-text-muted)' }}
+              >
+                {tab.subtitle}
+              </div>
+            </div>
           </button>
         ))}
       </div>
@@ -112,13 +131,25 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
             </div>
           ) : (
             <>
-              {activeTab === 1 && <Tab1Overview data={data.tab1.data} />}
-              {activeTab === 2 && <Tab2Intelligence data={data.tab2.data} />}
-              {activeTab === 3 && <Tab3Users data={data.tab3.data} />}
+              {activeTab === 'summary' && <SummaryTab data={data.summary.data} />}
+              {activeTab === 'product' && <ProductTab data={data.product.data} />}
+              {activeTab === 'business' && <BusinessTab data={data.business.data} />}
+              {activeTab === 'people' && <PeopleTabPlaceholder />}
             </>
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// Placeholder for People tab (not yet implemented)
+function PeopleTabPlaceholder() {
+  return (
+    <div className="text-center py-12" style={{ color: 'var(--vaaya-text-muted)' }}>
+      <div className="text-4xl mb-4">🚧</div>
+      <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--vaaya-text)' }}>People Tab Coming Soon</h3>
+      <p>Discovered users and buyers will appear here.</p>
     </div>
   );
 }

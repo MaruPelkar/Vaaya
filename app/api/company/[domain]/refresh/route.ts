@@ -1,8 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/db';
-import { executeTab1Strategies } from '@/lib/strategies/tab1';
-import { executeTab2Strategies } from '@/lib/strategies/tab2';
-import { executeTab3Strategies } from '@/lib/strategies/tab3';
+import { executeSummaryStrategies } from '@/lib/strategies/summary';
+import {
+  TabId,
+  getEmptyProductData,
+  getEmptyBusinessData,
+  getEmptyPeopleData,
+} from '@/lib/types';
 
 export const maxDuration = 60;
 
@@ -11,65 +15,72 @@ export async function POST(
   { params }: { params: Promise<{ domain: string }> }
 ) {
   const { domain } = await params;
-  const { tab } = await request.json();
-
-  if (![1, 2, 3].includes(tab)) {
-    return NextResponse.json({ error: 'Invalid tab' }, { status: 400 });
-  }
-
+  const { tab } = await request.json() as { tab: TabId };
   const supabase = createClient();
 
-  // Get company name
+  // Get company name from database
   const { data: company } = await supabase
     .from('companies')
     .select('name')
     .eq('domain', domain)
     .single();
 
-  if (!company) {
-    return NextResponse.json({ error: 'Company not found' }, { status: 404 });
+  const companyName = company?.name || domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
+
+  try {
+    let result: { data: unknown; sources: string[] };
+
+    switch (tab) {
+      case 'summary':
+        result = await executeSummaryStrategies(domain, companyName);
+        await supabase.from('companies').update({
+          summary_data: result.data,
+          summary_updated_at: new Date().toISOString(),
+          summary_sources: result.sources,
+        }).eq('domain', domain);
+        break;
+
+      case 'product':
+        // TODO: Implement product strategies
+        result = { data: getEmptyProductData(), sources: [] };
+        await supabase.from('companies').update({
+          product_data: result.data,
+          product_updated_at: new Date().toISOString(),
+          product_sources: result.sources,
+        }).eq('domain', domain);
+        break;
+
+      case 'business':
+        // TODO: Implement business strategies
+        result = { data: getEmptyBusinessData(), sources: [] };
+        await supabase.from('companies').update({
+          business_data: result.data,
+          business_updated_at: new Date().toISOString(),
+          business_sources: result.sources,
+        }).eq('domain', domain);
+        break;
+
+      case 'people':
+        // TODO: Implement people strategies
+        result = { data: getEmptyPeopleData(), sources: [] };
+        await supabase.from('companies').update({
+          people_data: result.data,
+          people_updated_at: new Date().toISOString(),
+          people_sources: result.sources,
+        }).eq('domain', domain);
+        break;
+
+      default:
+        return Response.json({ error: 'Invalid tab' }, { status: 400 });
+    }
+
+    return Response.json({
+      data: result.data,
+      updated_at: new Date().toISOString(),
+      sources: result.sources,
+    });
+  } catch (error) {
+    console.error(`Refresh ${tab} error:`, error);
+    return Response.json({ error: `Failed to refresh ${tab} data` }, { status: 500 });
   }
-
-  // Execute the appropriate strategy
-  let result;
-  let updateData: Record<string, unknown> = {};
-
-  switch (tab) {
-    case 1:
-      result = await executeTab1Strategies(domain, company.name);
-      updateData = {
-        tab1_data: result.data,
-        tab1_updated_at: new Date().toISOString(),
-        tab1_sources: result.sources,
-      };
-      break;
-    case 2:
-      result = await executeTab2Strategies(domain, company.name);
-      updateData = {
-        tab2_data: result.data,
-        tab2_updated_at: new Date().toISOString(),
-        tab2_sources: result.sources,
-      };
-      break;
-    case 3:
-      result = await executeTab3Strategies(domain, company.name);
-      updateData = {
-        tab3_data: result.data,
-        tab3_updated_at: new Date().toISOString(),
-        tab3_sources: result.sources,
-      };
-      break;
-  }
-
-  // Update database
-  await supabase
-    .from('companies')
-    .update(updateData)
-    .eq('domain', domain);
-
-  return NextResponse.json({
-    data: result?.data,
-    updated_at: updateData[`tab${tab}_updated_at`],
-    sources: result?.sources,
-  });
 }

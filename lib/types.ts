@@ -1,782 +1,545 @@
-// Database record
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPANY CORE
+// ═══════════════════════════════════════════════════════════════════════════════
+
 export interface Company {
   domain: string;
   name: string;
   logo_url: string | null;
-  tab1_data: Tab1Data;
-  tab1_updated_at: string | null;
-  tab1_sources: string[];
-  tab2_data: Tab2Data;
-  tab2_updated_at: string | null;
-  tab2_sources: string[];
-  tab3_data: Tab3Data;
-  tab3_updated_at: string | null;
-  tab3_sources: string[];
+  summary_data: SummaryData | null;
+  summary_updated_at: string | null;
+  summary_sources: string[];
+  product_data: ProductData | null;
+  product_updated_at: string | null;
+  product_sources: string[];
+  business_data: BusinessData | null;
+  business_updated_at: string | null;
+  business_sources: string[];
+  people_data: PeopleData | null;
+  people_updated_at: string | null;
+  people_sources: string[];
   created_at: string;
   updated_at: string;
 }
 
-// Tab 1: Company Overview
-export interface Tab1Data {
-  description: string;
-  founded: number | null;
-  headquarters: string | null;
-  employee_range: string | null;
-  industry: string | null;
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 1: SUMMARY - "Should I dig deeper?"
+// ═══════════════════════════════════════════════════════════════════════════════
 
-  // Company Status
-  status: 'active' | 'acquired' | 'ipo' | 'shut_down' | null;
-  acquired_by: string | null;
-  acquisition_date: string | null;
-  ipo_date: string | null;
-  stock_symbol: string | null;
+export interface SummaryData {
+  // One-liner + Category
+  one_liner: string;
+  category_tags: string[]; // e.g., ["CRM", "Sales Automation", "B2B SaaS"]
+  platforms: string[]; // e.g., ["Web", "iOS", "Android", "Chrome Extension"]
 
-  // Funding Details
-  funding: {
-    total: string | null;
-    last_round: string | null;
-    last_round_date: string | null;
-    investors: string[];
+  // ICP + Personas
+  icp_chips: string[]; // e.g., ["SMB Sales Teams", "Enterprise RevOps", "SaaS Startups"]
+  personas: {
+    users: PersonaSummary[];
+    buyers: PersonaSummary[];
   };
 
-  // Funding Timeline (detailed rounds)
-  funding_rounds: Array<{
-    round_type: string; // e.g., "Seed", "Series A", "Series B"
-    amount: string | null;
-    date: string | null;
-    valuation: string | null;
-    lead_investors: string[];
-  }>;
+  // Use Cases
+  top_use_cases: UseCase[];
 
-  // Employee Trend
-  employee_count: number | null;
-  employee_trend: Array<{
-    date: string;
-    count: number;
-  }>;
-  employee_growth_rate: string | null; // e.g., "+25% YoY"
+  // Competitive Position
+  why_they_win: string[]; // 3 bullets
+  where_they_lose: string[]; // 3 bullets
 
-  // Acquisitions Made
-  acquisitions: Array<{
-    company_name: string;
-    date: string | null;
-    amount: string | null;
-    description: string | null;
-  }>;
+  // Product Map
+  product_map: ProductModule[];
+
+  // Pricing
+  pricing_at_glance: {
+    has_free_tier: boolean;
+    free_tier_description: string | null;
+    starting_price: string | null; // e.g., "$49/user/month"
+    enterprise_gates: string[]; // e.g., ["SSO", "SAML", "Custom SLAs"]
+    pricing_model: 'per_seat' | 'usage_based' | 'flat_rate' | 'hybrid' | 'unknown';
+  };
+
+  // Key Signals
+  signals: {
+    funding_stage: string | null; // e.g., "Series B"
+    total_funding: string | null;
+    last_funding_date: string | null;
+    headcount: number | null;
+    headcount_trend: 'growing' | 'stable' | 'shrinking' | null;
+    hiring_mix: HiringMix | null;
+  };
+
+  // Recent Changes
+  recent_changes: {
+    thirty_days: RecentChange[];
+    ninety_days: RecentChange[];
+  };
+
+  // Metadata
+  generated_at: string;
+}
+
+export interface PersonaSummary {
+  title: string; // e.g., "Sales Development Rep"
+  seniority: 'ic' | 'manager' | 'director' | 'vp' | 'c_level';
+  department: string;
+}
+
+export interface UseCase {
+  title: string;
+  description: string;
+  persona_fit: string[];
+}
+
+export interface ProductModule {
+  name: string;
+  description: string;
+  key_features: string[];
+}
+
+export interface HiringMix {
+  engineering_pct: number;
+  sales_pct: number;
+  product_pct: number;
+  other_pct: number;
+}
+
+export interface RecentChange {
+  type: 'product_launch' | 'pricing_change' | 'acquisition' | 'funding' | 'leadership' | 'partnership' | 'positioning';
+  title: string;
+  date: string;
+  source_url: string | null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 2: PRODUCT - "How it actually works"
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface ProductData {
+  // Feature Map grouped by workflow stage
+  feature_map: {
+    onboarding: Feature[];
+    core_action: Feature[];
+    collaboration: Feature[];
+    reporting: Feature[];
+    admin: Feature[];
+  };
+
+  // Filter metadata
+  available_personas: string[];
+  available_plan_gates: string[];
+  available_feature_areas: string[];
+
+  // Personas (detailed)
+  personas: PersonaDetail[];
+
+  // Integrations
+  integrations: {
+    top_integrations: Integration[];
+    categories: IntegrationCategory[];
+    total_count: number;
+  };
+
+  // Generated at
+  generated_at: string;
+}
+
+export interface Feature {
+  name: string;
+  description: string;
+  personas: string[]; // which personas use it
+  plan_gate: 'free' | 'starter' | 'pro' | 'enterprise' | 'all';
+  feature_area: string;
+  is_new: boolean;
+  is_updated: boolean;
+  update_date: string | null;
+}
+
+export interface PersonaDetail {
+  title: string;
+  seniority: 'ic' | 'manager' | 'director' | 'vp' | 'c_level';
+  department: string;
+  jobs_to_be_done: string[];
+  key_features_used: string[];
+  pain_points_solved: string[];
+}
+
+export interface Integration {
+  name: string;
+  category: string;
+  depth: 'native' | 'api' | 'zapier_only' | 'partner';
+  description: string;
+  logo_url: string | null;
+}
+
+export interface IntegrationCategory {
+  name: string;
+  count: number;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 3: BUSINESS - "Can they win and how do they make money"
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface BusinessData {
+  // Pricing & Packaging
+  pricing: {
+    plans: PricingPlan[];
+    enterprise_info: {
+      has_enterprise: boolean;
+      contact_sales: boolean;
+      known_features: string[];
+    };
+    trial_info: {
+      has_free_trial: boolean;
+      trial_length_days: number | null;
+      requires_credit_card: boolean | null;
+    };
+    pricing_page_url: string | null;
+  };
 
   // Competitive Landscape
-  competitors: Array<{
-    name: string;
-    domain: string | null;
-    description: string | null;
-  }>;
-
-  leadership: Array<{
-    name: string;
-    title: string;
-    linkedin_url: string | null;
-  }>;
-  socials: {
-    twitter: string | null;
-    linkedin: string | null;
-    github: string | null;
+  competitive: {
+    direct_competitors: Competitor[];
+    alternatives: Competitor[];
+    differentiators: string[];
+    competitive_positioning: string;
   };
-  website: string;
-}
 
-// Tab 2: Market Intelligence - Product Intelligence Engine
-export interface Tab2Data {
-  executive_brief: ExecutiveBrief;
-  tier1: Tier1OfficialSources;
-  tier2: Tier2CommunitySources;
-  tier3: Tier3ProductIntelligence;
-}
+  // Traction Signals
+  traction: {
+    funding: FundingInfo;
+    hiring: HiringInfo;
+    web_proxies: WebProxy;
+    customer_proof: CustomerProof;
+  };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// EXECUTIVE BRIEF
-// ═══════════════════════════════════════════════════════════════════════════════
+  // Timeline (filterable feed)
+  timeline: TimelineEvent[];
 
-export interface ExecutiveBrief {
+  // Sources
+  sources: SourceReference[];
+
+  // Generated at
   generated_at: string;
-
-  whats_new: {
-    summary: string;
-    releases: Array<{
-      title: string;
-      type: 'major_feature' | 'minor_feature' | 'integration' | 'improvement' | 'announcement';
-      date: string;
-      description: string;
-      source: string;
-      source_url: string;
-      impact: 'high' | 'medium' | 'low';
-    }>;
-    time_period: string;
-    total_releases_found: number;
-  };
-
-  market_reaction: {
-    summary: string;
-    sentiment: {
-      score: number; // 0-100
-      label: 'very_positive' | 'positive' | 'mixed' | 'negative' | 'very_negative';
-      trend: 'improving' | 'stable' | 'declining';
-      based_on_mentions: number;
-    };
-    positive_themes: Array<{
-      theme: string;
-      frequency: 'very_common' | 'common' | 'occasional';
-      example_quote: string | null;
-      sources: string[];
-    }>;
-    negative_themes: Array<{
-      theme: string;
-      frequency: 'very_common' | 'common' | 'occasional';
-      example_quote: string | null;
-      sources: string[];
-    }>;
-    notable_reactions: Array<{
-      quote: string;
-      source: string;
-      source_url: string | null;
-      sentiment: 'positive' | 'negative' | 'neutral';
-      author_context: string | null;
-    }>;
-  };
-
-  product_direction: {
-    summary: string;
-    confirmed_roadmap: Array<{
-      feature: string;
-      status: 'announced' | 'in_beta' | 'coming_soon';
-      expected_timeline: string | null;
-      source: string;
-      source_url: string;
-    }>;
-    likely_priorities: Array<{
-      area: string;
-      confidence: 'high' | 'medium' | 'low';
-      evidence: string[];
-      signal_count: number;
-    }>;
-    top_requested_features: Array<{
-      feature: string;
-      demand_level: 'high' | 'medium' | 'low';
-      sources: string[];
-      vote_count: number | null;
-    }>;
-    strategic_signals: Array<{
-      signal: string;
-      evidence: string;
-      confidence: 'high' | 'medium' | 'low';
-    }>;
-  };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// TIER 1: OFFICIAL SOURCES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export interface Tier1OfficialSources {
-  g2: {
-    url: string;
-    overall_rating: number;
-    total_reviews: number;
-    review_trend: 'up' | 'down' | 'stable';
-    categories: Array<{
-      category: string;
-      rank: number | null;
-      total_in_category: number | null;
-      badge: string | null;
-    }>;
-    scores: {
-      ease_of_use: number | null;
-      quality_of_support: number | null;
-      ease_of_setup: number | null;
-      ease_of_admin: number | null;
-    };
-    top_pros: string[];
-    top_cons: string[];
-    recent_reviews: Array<{
-      rating: number;
-      title: string;
-      snippet: string;
-      reviewer_role: string | null;
-      reviewer_company_size: string | null;
-      date: string;
-      url: string;
-    }>;
-  } | null;
-
-  capterra: {
-    url: string;
-    overall_rating: number;
-    total_reviews: number;
-    scores: {
-      ease_of_use: number | null;
-      customer_service: number | null;
-      features: number | null;
-      value_for_money: number | null;
-    };
-    recent_reviews: Array<{
-      rating: number;
-      title: string;
-      snippet: string;
-      date: string;
-      url: string;
-    }>;
-  } | null;
-
-  trustradius: {
-    url: string;
-    tr_score: number;
-    total_reviews: number;
-    recent_reviews: Array<{
-      rating: number;
-      snippet: string;
-      date: string;
-      url: string;
-    }>;
-  } | null;
-
-  gartner: {
-    peer_insights_rating: number | null;
-    magic_quadrant: {
-      position: 'Leader' | 'Challenger' | 'Visionary' | 'Niche Player' | null;
-      year: number;
-      report_url: string | null;
-    } | null;
-    key_strengths: string[];
-    cautions: string[];
-  } | null;
-
-  forrester: {
-    wave_position: string | null;
-    wave_year: number | null;
-  } | null;
-
-  linkedin: {
-    company_url: string;
-    follower_count: number | null;
-    follower_growth: number | null;
-    company_posts: Array<{
-      content_snippet: string;
-      post_type: 'product_update' | 'hiring' | 'thought_leadership' | 'company_news' | 'other';
-      engagement: {
-        likes: number;
-        comments: number;
-      };
-      date: string;
-      url: string;
-    }>;
-    employee_posts: Array<{
-      author_name: string;
-      author_title: string;
-      content_snippet: string;
-      is_product_related: boolean;
-      engagement: number;
-      date: string;
-      url: string;
-    }>;
-  } | null;
-
-  crunchbase_news: Array<{
-    title: string;
-    date: string;
-    category: 'funding' | 'acquisition' | 'product' | 'partnership' | 'leadership' | 'other';
-    url: string;
-  }>;
-
-  press_releases: Array<{
-    title: string;
-    date: string;
-    source: string;
-    category: 'product' | 'partnership' | 'funding' | 'expansion' | 'award' | 'other';
-    snippet: string;
-    url: string;
-    key_announcement: string;
-  }>;
-
-  analyst_coverage: Array<{
-    analyst_firm: string;
-    report_type: string;
-    mention_context: string;
-    date: string;
-    url: string | null;
-  }>;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TIER 2: COMMUNITY & SOCIAL
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export interface Tier2CommunitySources {
-  aggregate_sentiment: {
-    score: number;
-    label: 'positive' | 'mixed' | 'negative';
-    total_mentions: number;
-    most_active_platform: string;
-  };
-
-  reddit: {
-    subreddits_active: string[];
-    has_dedicated_subreddit: boolean;
-    dedicated_subreddit_members: number | null;
-    sentiment: {
-      positive: number;
-      neutral: number;
-      negative: number;
-    };
-    top_threads: Array<{
-      subreddit: string;
-      title: string;
-      score: number;
-      num_comments: number;
-      date: string;
-      sentiment: 'positive' | 'negative' | 'neutral' | 'mixed';
-      key_points: string[];
-      url: string;
-    }>;
-    common_praise: string[];
-    common_complaints: string[];
-    competitor_mentions: Array<{
-      competitor: string;
-      context: string;
-      comparison_sentiment: 'favorable' | 'unfavorable' | 'neutral';
-    }>;
-  } | null;
-
-  twitter: {
-    mention_volume_30d: number | null;
-    sentiment_score: number | null;
-    notable_tweets: Array<{
-      author_handle: string;
-      author_followers: number | null;
-      content: string;
-      likes: number;
-      retweets: number;
-      date: string;
-      sentiment: 'positive' | 'negative' | 'neutral';
-      url: string;
-    }>;
-    influencer_mentions: Array<{
-      author: string;
-      followers: number | null;
-      content_snippet: string;
-      sentiment: 'positive' | 'negative' | 'neutral';
-      url: string;
-    }>;
-    trending_topics: string[];
-  } | null;
-
-  hacker_news: {
-    total_stories: number;
-    total_comments: number;
-    top_stories: Array<{
-      title: string;
-      points: number;
-      num_comments: number;
-      date: string;
-      discussion_sentiment: 'positive' | 'negative' | 'mixed';
-      key_discussion_points: string[];
-      url: string;
-    }>;
-    show_hn_posts: Array<{
-      title: string;
-      points: number;
-      num_comments: number;
-      date: string;
-      url: string;
-    }>;
-    notable_comments: Array<{
-      context: string;
-      comment_snippet: string;
-      points: number;
-    }>;
-  } | null;
-
-  facebook: {
-    has_official_page: boolean;
-    page_followers: number | null;
-    group_mentions: Array<{
-      group_name: string;
-      post_topic: string;
-      engagement: number;
-      sentiment: 'positive' | 'negative' | 'neutral';
-      date: string;
-    }>;
-  } | null;
-
-  discord: {
-    has_official_server: boolean;
-    server_members: number | null;
-    server_url: string | null;
-    discussion_themes: string[];
-    activity_level: 'very_active' | 'active' | 'moderate' | 'low' | 'unknown';
-  } | null;
-
-  official_community: {
-    platform: string;
-    url: string;
-    total_members: number | null;
-    total_topics: number | null;
-    hot_topics: Array<{
-      title: string;
-      replies: number;
-      views: number | null;
-      category: string;
-      is_feature_request: boolean;
-      is_bug_report: boolean;
-      url: string;
-    }>;
-    trending_feature_requests: string[];
-    common_support_issues: string[];
-    unanswered_questions: number | null;
-  } | null;
-
-  youtube: {
-    official_channel_subs: number | null;
-    third_party_reviews: Array<{
-      channel_name: string;
-      title: string;
-      views: number;
-      sentiment: 'positive' | 'negative' | 'neutral';
-      url: string;
-    }>;
-  } | null;
-
-  product_hunt: {
-    total_launches: number;
-    latest_launch: {
-      name: string;
-      tagline: string;
-      upvotes: number;
-      date: string;
-      url: string;
-    } | null;
-  } | null;
-
-  quora: {
-    questions_found: number;
-    notable_qa: Array<{
-      question: string;
-      answer_snippet: string;
-      views: number;
-    }>;
-  } | null;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TIER 3: PRODUCT INTELLIGENCE
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export interface Tier3ProductIntelligence {
-  changelog: {
-    url: string | null;
-    releases: Array<{
-      version: string | null;
-      date: string;
-      title: string;
-      type: 'major' | 'minor' | 'patch' | 'announcement';
-      highlights: string[];
-      url: string;
-    }>;
-    velocity: {
-      releases_last_30_days: number;
-      releases_last_90_days: number;
-      average_days_between_releases: number;
-      trend: 'accelerating' | 'stable' | 'slowing';
-    };
-    active_areas: Array<{
-      area: string;
-      update_count: number;
-      recent_examples: string[];
-    }>;
-  } | null;
-
-  help_docs: {
-    url: string | null;
-    recent_additions: Array<{
-      title: string;
-      category: string;
-      date_detected: string;
-      url: string;
-      inferred_feature: string | null;
-    }>;
-    main_categories: string[];
-    signals: {
-      has_api_docs: boolean;
-      has_developer_portal: boolean;
-      documentation_quality: 'comprehensive' | 'adequate' | 'limited' | 'unknown';
-    };
-  } | null;
-
-  github: {
-    org_name: string | null;
-    main_repo: string | null;
-    is_open_source: boolean;
-    metrics: {
-      stars: number;
-      forks: number;
-      open_issues: number;
-      open_prs: number;
-      contributors: number;
-      last_commit: string;
-      activity_level: 'very_active' | 'active' | 'moderate' | 'low';
-    } | null;
-    recent_issues: Array<{
-      title: string;
-      number: number;
-      state: 'open' | 'closed';
-      labels: string[];
-      comments: number;
-      reactions: number;
-      date: string;
-      issue_type: 'bug' | 'feature_request' | 'question' | 'other';
-      url: string;
-    }>;
-    hot_issues: Array<{
-      title: string;
-      comments: number;
-      reactions: number;
-      url: string;
-    }>;
-    feature_requests: Array<{
-      title: string;
-      reactions: number;
-      comments: number;
-      status: 'open' | 'planned' | 'in_progress' | 'closed';
-      url: string;
-    }>;
-    bug_patterns: string[];
-    recent_prs: Array<{
-      title: string;
-      merged_at: string;
-      labels: string[];
-      url: string;
-    }>;
-    inferred_priorities: string[];
-  } | null;
-
-  support: {
-    help_center_url: string | null;
-    common_issues: Array<{
-      issue: string;
-      frequency: 'high' | 'medium' | 'low';
-      category: string;
-    }>;
-    support_signals: {
-      g2_support_rating: number | null;
-      response_time_claim: string | null;
-      community_sentiment: 'positive' | 'mixed' | 'negative';
-    };
-    pain_points: Array<{
-      issue: string;
-      severity: 'critical' | 'major' | 'minor';
-      source: string;
-    }>;
-  };
-
-  api_docs: {
-    url: string | null;
-    has_public_api: boolean;
-    recent_changes: Array<{
-      change: string;
-      type: 'new_endpoint' | 'deprecation' | 'breaking' | 'enhancement';
-      date: string | null;
-    }>;
-    integrations: {
-      native_count: number | null;
-      zapier: boolean;
-      make: boolean;
-      api_quality: 'excellent' | 'good' | 'limited' | 'unknown';
-    };
-  } | null;
-
-  public_roadmap: {
-    url: string;
-    platform: string;
-    items: Array<{
-      title: string;
-      status: 'under_review' | 'planned' | 'in_progress' | 'completed';
-      votes: number | null;
-      category: string | null;
-      expected_date: string | null;
-    }>;
-    most_voted: Array<{
-      title: string;
-      votes: number;
-      status: string;
-    }>;
-  } | null;
-
-  status_page: {
-    url: string;
-    current_status: 'operational' | 'degraded' | 'outage';
-    uptime_90d: number | null;
-    recent_incidents: Array<{
-      title: string;
-      date: string;
-      severity: 'minor' | 'major' | 'critical';
-      duration_minutes: number | null;
-      affected: string[];
-    }>;
-  } | null;
-
-  job_signals: {
-    total_open_roles: number;
-    careers_url: string | null;
-    product_signals: Array<{
-      role_title: string;
-      inferred_focus: string;
-      key_requirements: string[];
-    }>;
-    tech_investments: Array<{
-      technology: string;
-      role_count: number;
-      signal: string;
-    }>;
-    team_signals: string[];
-    expansion_signals: string[];
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TAB 3: USER DISCOVERY ENGINE
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export type SignalSource =
-  // Tier 1: Direct (0.80 - 0.95)
-  | 'g2_review' | 'capterra_review' | 'trustradius_review'
-  | 'linkedin_post' | 'twitter_post' | 'testimonial'
-  | 'case_study' | 'product_hunt' | 'youtube_review'
-  // Tier 2: Community (0.60 - 0.75)
-  | 'github_issue' | 'github_discussion' | 'stackoverflow'
-  | 'reddit_post' | 'reddit_comment' | 'hn_comment'
-  | 'forum_post' | 'discord' | 'github_star' | 'github_contributor'
-  // Tier 3: Inferred (0.45 - 0.55)
-  | 'job_posting' | 'logo_wall' | 'press_mention' | 'integration_user'
-  // Tier 4: Technical
-  | 'config_file';
-
-export interface RawSignal {
-  id: string;
-  source: SignalSource;
-  tier: 1 | 2 | 3 | 4;
-  source_url: string;
-
-  // Extracted person info
-  extracted_name: string | null;
-  extracted_company: string | null;
-  extracted_role: string | null;
-  extracted_linkedin: string | null;
-  extracted_twitter: string | null;
-  extracted_github: string | null;
-  extracted_email: string | null;
-
-  // Context
-  signal_text: string;
-  signal_date: string | null;
-  base_confidence: number; // 0-1
-
-  // Optional metadata
-  metadata?: Record<string, string | number | null>;
-}
-
-export interface DiscoveredUser {
-  id: string;
-
-  // Identity
+export interface PricingPlan {
   name: string;
-  company: string | null;
-  role: string | null;
-
-  // Contact
-  linkedin_url: string | null;
-  twitter_handle: string | null;
-  github_username: string | null;
-  email: string | null;
-
-  // Scoring
-  confidence_score: number; // 0-100
-  signal_count: number;
-  strongest_signal: SignalSource;
-
-  // Evidence
-  signals: Array<{
-    source: SignalSource;
-    tier: number;
-    text: string;
-    url: string;
-    date: string | null;
-    confidence: number;
-  }>;
+  price: string | null; // e.g., "$49/month" or "Custom"
+  billing_cycle: 'monthly' | 'annual' | 'custom' | null;
+  limits: PlanLimit[];
+  key_features: string[];
+  target_audience: string | null;
 }
 
-export interface Tab3Data {
+export interface PlanLimit {
+  name: string;
+  value: string;
+}
+
+export interface Competitor {
+  name: string;
+  domain: string | null;
+  description: string;
+  positioning: string;
+}
+
+export interface FundingInfo {
+  total_raised: string | null;
+  last_round: string | null;
+  last_round_date: string | null;
+  last_round_amount: string | null;
+  investors: string[];
+  valuation: string | null;
+}
+
+export interface HiringInfo {
+  total_open_roles: number;
+  velocity: 'accelerating' | 'stable' | 'slowing' | 'unknown';
+  key_hires_focus: string[];
+  careers_url: string | null;
+}
+
+export interface WebProxy {
+  estimated_traffic: string | null;
+  traffic_trend: 'up' | 'stable' | 'down' | 'unknown';
+}
+
+export interface CustomerProof {
+  notable_customers: string[];
+  case_studies_count: number;
+  testimonials_count: number;
+}
+
+export interface TimelineEvent {
+  type: 'pricing_change' | 'product_launch' | 'funding' | 'acquisition' | 'leadership' | 'partnership' | 'repositioning';
+  title: string;
+  description: string;
+  date: string;
+  source_url: string | null;
+  source_name: string;
+}
+
+export interface SourceReference {
+  name: string;
+  url: string;
+  type: 'official' | 'review' | 'news' | 'social' | 'community';
+  last_accessed: string;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 4: PEOPLE - "Users who have used the product"
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface PeopleData {
   summary: {
-    total_users_found: number;
-    high_confidence_count: number;  // ≥70
-    medium_confidence_count: number; // 40-69
-    low_confidence_count: number;   // <40
+    total_people_found: number;
+    users_count: number;
+    buyers_count: number;
+    high_confidence_count: number;
+    medium_confidence_count: number;
+    low_confidence_count: number;
     signals_collected: number;
     sources_searched: string[];
   };
 
-  users: DiscoveredUser[];
+  users: DiscoveredPerson[];
+  buyers: DiscoveredPerson[];
 
-  // For Tier 3: companies we identified
-  companies_identified: Array<{
-    name: string;
-    source: string;
-    signals: number;
-  }>;
+  companies_using: CompanyUsing[];
 
   collected_at: string;
   collection_time_ms: number;
 }
 
-// Legacy type alias for backward compatibility
-export type SignalType = SignalSource;
-
-// Autocomplete response
-export interface AutocompleteResult {
+export interface DiscoveredPerson {
+  id: string;
   name: string;
-  domain: string;
-  logo: string;
+  company: string | null;
+  role: string | null;
+
+  // Type classification
+  person_type: 'user' | 'buyer' | 'evaluator' | 'unknown';
+
+  // Contact info
+  linkedin_url: string | null;
+  twitter_handle: string | null;
+  email: string | null;
+
+  // Scoring
+  confidence_score: number;
+  signal_count: number;
+
+  // Persona tags
+  persona_tags: string[];
+
+  // Evidence
+  signals: PersonSignal[];
 }
 
-// API response types
+export interface PersonSignal {
+  source: SignalSource;
+  tier: 1 | 2 | 3;
+  text: string;
+  url: string;
+  date: string | null;
+  confidence: number;
+  indicates_usage: boolean;
+  indicates_purchase_authority: boolean;
+}
+
+export interface CompanyUsing {
+  name: string;
+  domain: string | null;
+  logo_url: string | null;
+  industry: string | null;
+  size: string | null;
+  signal_count: number;
+  confidence: 'high' | 'medium' | 'low';
+}
+
+export type SignalSource =
+  | 'g2_review' | 'capterra_review' | 'trustradius_review'
+  | 'linkedin_post' | 'twitter_post' | 'testimonial'
+  | 'case_study' | 'product_hunt' | 'youtube_review'
+  | 'github_issue' | 'github_discussion' | 'stackoverflow'
+  | 'reddit_post' | 'reddit_comment' | 'hn_comment'
+  | 'forum_post' | 'discord' | 'slack_community'
+  | 'job_posting' | 'logo_wall' | 'press_mention';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// API TYPES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export type TabId = 'summary' | 'product' | 'business' | 'people';
+
 export interface CompanyResponse {
   company: {
     domain: string;
     name: string;
     logo_url: string | null;
   };
-  tab1: {
-    data: Tab1Data;
-    updated_at: string | null;
-    sources: string[];
-    loading?: boolean;
-  };
-  tab2: {
-    data: Tab2Data;
-    updated_at: string | null;
-    sources: string[];
-    loading?: boolean;
-  };
-  tab3: {
-    data: Tab3Data;
-    updated_at: string | null;
-    sources: string[];
-    loading?: boolean;
-  };
+  summary: TabData<SummaryData>;
+  product: TabData<ProductData>;
+  business: TabData<BusinessData>;
+  people: TabData<PeopleData>;
+}
+
+export interface TabData<T> {
+  data: T | null;
+  updated_at: string | null;
+  sources: string[];
+  loading?: boolean;
 }
 
 // Streaming event types
 export type StreamEvent =
-  | { type: 'tab_started'; tab: 1 | 2 | 3 }
-  | { type: 'tab_complete'; tab: 1 | 2 | 3; data: Tab1Data | Tab2Data | Tab3Data; sources: string[] }
-  | { type: 'tab_error'; tab: 1 | 2 | 3; error: string }
+  | { type: 'tab_started'; tab: TabId }
+  | { type: 'tab_complete'; tab: TabId; data: SummaryData | ProductData | BusinessData | PeopleData; sources: string[] }
+  | { type: 'tab_error'; tab: TabId; error: string }
   | { type: 'all_complete' }
   | { type: 'company_info'; name: string; logo_url: string | null }
   | { type: 'error'; message: string };
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUTOCOMPLETE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface AutocompleteResult {
+  name: string;
+  domain: string;
+  logo: string;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMPTY DATA FACTORIES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export function getEmptySummaryData(): SummaryData {
+  return {
+    one_liner: '',
+    category_tags: [],
+    platforms: [],
+    icp_chips: [],
+    personas: { users: [], buyers: [] },
+    top_use_cases: [],
+    why_they_win: [],
+    where_they_lose: [],
+    product_map: [],
+    pricing_at_glance: {
+      has_free_tier: false,
+      free_tier_description: null,
+      starting_price: null,
+      enterprise_gates: [],
+      pricing_model: 'unknown',
+    },
+    signals: {
+      funding_stage: null,
+      total_funding: null,
+      last_funding_date: null,
+      headcount: null,
+      headcount_trend: null,
+      hiring_mix: null,
+    },
+    recent_changes: {
+      thirty_days: [],
+      ninety_days: [],
+    },
+    generated_at: new Date().toISOString(),
+  };
+}
+
+export function getEmptyProductData(): ProductData {
+  return {
+    feature_map: {
+      onboarding: [],
+      core_action: [],
+      collaboration: [],
+      reporting: [],
+      admin: [],
+    },
+    available_personas: [],
+    available_plan_gates: [],
+    available_feature_areas: [],
+    personas: [],
+    integrations: {
+      top_integrations: [],
+      categories: [],
+      total_count: 0,
+    },
+    generated_at: new Date().toISOString(),
+  };
+}
+
+export function getEmptyBusinessData(): BusinessData {
+  return {
+    pricing: {
+      plans: [],
+      enterprise_info: {
+        has_enterprise: false,
+        contact_sales: false,
+        known_features: [],
+      },
+      trial_info: {
+        has_free_trial: false,
+        trial_length_days: null,
+        requires_credit_card: null,
+      },
+      pricing_page_url: null,
+    },
+    competitive: {
+      direct_competitors: [],
+      alternatives: [],
+      differentiators: [],
+      competitive_positioning: '',
+    },
+    traction: {
+      funding: {
+        total_raised: null,
+        last_round: null,
+        last_round_date: null,
+        last_round_amount: null,
+        investors: [],
+        valuation: null,
+      },
+      hiring: {
+        total_open_roles: 0,
+        velocity: 'unknown',
+        key_hires_focus: [],
+        careers_url: null,
+      },
+      web_proxies: {
+        estimated_traffic: null,
+        traffic_trend: 'unknown',
+      },
+      customer_proof: {
+        notable_customers: [],
+        case_studies_count: 0,
+        testimonials_count: 0,
+      },
+    },
+    timeline: [],
+    sources: [],
+    generated_at: new Date().toISOString(),
+  };
+}
+
+export function getEmptyPeopleData(): PeopleData {
+  return {
+    summary: {
+      total_people_found: 0,
+      users_count: 0,
+      buyers_count: 0,
+      high_confidence_count: 0,
+      medium_confidence_count: 0,
+      low_confidence_count: 0,
+      signals_collected: 0,
+      sources_searched: [],
+    },
+    users: [],
+    buyers: [],
+    companies_using: [],
+    collected_at: new Date().toISOString(),
+    collection_time_ms: 0,
+  };
+}
