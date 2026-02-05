@@ -1,8 +1,15 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/db';
-import { executeTab1Strategies } from '@/lib/strategies/tab1';
-import { executeTab2Strategies } from '@/lib/strategies/tab2';
-import { executeTab3Strategies } from '@/lib/strategies/tab3';
+import { executeSummaryStrategies } from '@/lib/strategies/summary';
+import { executeProductStrategies } from '@/lib/strategies/product';
+import { executeBusinessStrategies } from '@/lib/strategies/business';
+import {
+  TabId,
+  getEmptySummaryData,
+  getEmptyProductData,
+  getEmptyBusinessData,
+  getEmptyPeopleData,
+} from '@/lib/types';
 
 export const maxDuration = 60; // Vercel function timeout
 
@@ -20,7 +27,7 @@ export async function GET(
     .eq('domain', domain)
     .single();
 
-  if (existing && existing.tab1_updated_at) {
+  if (existing && existing.summary_updated_at) {
     // Return cached data
     return Response.json({
       company: {
@@ -28,20 +35,25 @@ export async function GET(
         name: existing.name,
         logo_url: existing.logo_url,
       },
-      tab1: {
-        data: existing.tab1_data,
-        updated_at: existing.tab1_updated_at,
-        sources: existing.tab1_sources,
+      summary: {
+        data: existing.summary_data,
+        updated_at: existing.summary_updated_at,
+        sources: existing.summary_sources || [],
       },
-      tab2: {
-        data: existing.tab2_data,
-        updated_at: existing.tab2_updated_at,
-        sources: existing.tab2_sources,
+      product: {
+        data: existing.product_data || getEmptyProductData(),
+        updated_at: existing.product_updated_at,
+        sources: existing.product_sources || [],
       },
-      tab3: {
-        data: existing.tab3_data,
-        updated_at: existing.tab3_updated_at,
-        sources: existing.tab3_sources,
+      business: {
+        data: existing.business_data || getEmptyBusinessData(),
+        updated_at: existing.business_updated_at,
+        sources: existing.business_sources || [],
+      },
+      people: {
+        data: existing.people_data || getEmptyPeopleData(),
+        updated_at: existing.people_updated_at,
+        sources: existing.people_sources || [],
       },
     });
   }
@@ -74,55 +86,116 @@ export async function GET(
       });
 
       // Execute tabs in parallel
+      // Summary, Product, and Business tabs are implemented. People tab returns empty data.
       await Promise.allSettled([
+        // Summary Tab
         (async () => {
-          await sendEvent({ type: 'tab_started', tab: 1 });
+          await sendEvent({ type: 'tab_started', tab: 'summary' as TabId });
           try {
-            const result = await executeTab1Strategies(domain, companyName);
+            const result = await executeSummaryStrategies(domain, companyName);
 
-            // Update company name from Perplexity results if available
-            if (result.data.description) {
-              await supabase.from('companies').update({
-                tab1_data: result.data,
-                tab1_updated_at: new Date().toISOString(),
-                tab1_sources: result.sources,
-              }).eq('domain', domain);
-            }
+            await supabase.from('companies').update({
+              summary_data: result.data,
+              summary_updated_at: new Date().toISOString(),
+              summary_sources: result.sources,
+            }).eq('domain', domain);
 
-            await sendEvent({ type: 'tab_complete', tab: 1, data: result.data, sources: result.sources });
+            await sendEvent({
+              type: 'tab_complete',
+              tab: 'summary' as TabId,
+              data: result.data,
+              sources: result.sources,
+            });
           } catch (error) {
-            console.error('Tab 1 error:', error);
-            await sendEvent({ type: 'tab_error', tab: 1, error: 'Failed to fetch company overview' });
+            console.error('Summary tab error:', error);
+            await sendEvent({
+              type: 'tab_error',
+              tab: 'summary' as TabId,
+              error: 'Failed to fetch company summary',
+            });
           }
         })(),
+
+        // Product Tab
         (async () => {
-          await sendEvent({ type: 'tab_started', tab: 2 });
+          await sendEvent({ type: 'tab_started', tab: 'product' as TabId });
           try {
-            const result = await executeTab2Strategies(domain, companyName);
+            const result = await executeProductStrategies(domain, companyName);
+
             await supabase.from('companies').update({
-              tab2_data: result.data,
-              tab2_updated_at: new Date().toISOString(),
-              tab2_sources: result.sources,
+              product_data: result.data,
+              product_updated_at: new Date().toISOString(),
+              product_sources: result.sources,
             }).eq('domain', domain);
-            await sendEvent({ type: 'tab_complete', tab: 2, data: result.data, sources: result.sources });
+
+            await sendEvent({
+              type: 'tab_complete',
+              tab: 'product' as TabId,
+              data: result.data,
+              sources: result.sources,
+            });
           } catch (error) {
-            console.error('Tab 2 error:', error);
-            await sendEvent({ type: 'tab_error', tab: 2, error: 'Failed to fetch market intelligence' });
+            console.error('Product tab error:', error);
+            await sendEvent({
+              type: 'tab_error',
+              tab: 'product' as TabId,
+              error: 'Failed to fetch product data',
+            });
           }
         })(),
+
+        // Business Tab
         (async () => {
-          await sendEvent({ type: 'tab_started', tab: 3 });
+          await sendEvent({ type: 'tab_started', tab: 'business' as TabId });
           try {
-            const result = await executeTab3Strategies(domain, companyName);
+            const result = await executeBusinessStrategies(domain, companyName);
+
             await supabase.from('companies').update({
-              tab3_data: result.data,
-              tab3_updated_at: new Date().toISOString(),
-              tab3_sources: result.sources,
+              business_data: result.data,
+              business_updated_at: new Date().toISOString(),
+              business_sources: result.sources,
             }).eq('domain', domain);
-            await sendEvent({ type: 'tab_complete', tab: 3, data: result.data, sources: result.sources });
+
+            await sendEvent({
+              type: 'tab_complete',
+              tab: 'business' as TabId,
+              data: result.data,
+              sources: result.sources,
+            });
           } catch (error) {
-            console.error('Tab 3 error:', error);
-            await sendEvent({ type: 'tab_error', tab: 3, error: 'Failed to fetch user discovery' });
+            console.error('Business tab error:', error);
+            await sendEvent({
+              type: 'tab_error',
+              tab: 'business' as TabId,
+              error: 'Failed to fetch business data',
+            });
+          }
+        })(),
+
+        // People Tab (placeholder - returns empty data for now)
+        (async () => {
+          await sendEvent({ type: 'tab_started', tab: 'people' as TabId });
+          try {
+            const emptyData = getEmptyPeopleData();
+            await supabase.from('companies').update({
+              people_data: emptyData,
+              people_updated_at: new Date().toISOString(),
+              people_sources: [],
+            }).eq('domain', domain);
+
+            await sendEvent({
+              type: 'tab_complete',
+              tab: 'people' as TabId,
+              data: emptyData,
+              sources: [],
+            });
+          } catch (error) {
+            console.error('People tab error:', error);
+            await sendEvent({
+              type: 'tab_error',
+              tab: 'people' as TabId,
+              error: 'Failed to fetch people data',
+            });
           }
         })(),
       ]);

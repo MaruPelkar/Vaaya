@@ -21,9 +21,7 @@ const SIGNAL_LABELS: Partial<Record<SignalSource, string>> = {
   reddit_comment: 'Reddit',
   forum_post: 'Forum',
   github_issue: 'GitHub',
-  github_contributor: 'GitHub Contrib',
   github_discussion: 'GitHub Discussion',
-  github_star: 'GitHub Star',
   stackoverflow: 'Stack Overflow',
   hn_comment: 'Hacker News',
   job_posting: 'Job Posting',
@@ -32,8 +30,7 @@ const SIGNAL_LABELS: Partial<Record<SignalSource, string>> = {
   product_hunt: 'Product Hunt',
   youtube_review: 'YouTube',
   discord: 'Discord',
-  integration_user: 'Integration',
-  config_file: 'Config',
+  slack_community: 'Slack',
 };
 
 const SIGNAL_COLORS: Partial<Record<SignalSource, string>> = {
@@ -48,9 +45,7 @@ const SIGNAL_COLORS: Partial<Record<SignalSource, string>> = {
   reddit_comment: 'bg-red-100 text-red-700',
   forum_post: 'bg-gray-100 text-gray-700',
   github_issue: 'bg-gray-800 text-white',
-  github_contributor: 'bg-gray-800 text-white',
   github_discussion: 'bg-gray-800 text-white',
-  github_star: 'bg-gray-800 text-white',
   stackoverflow: 'bg-amber-100 text-amber-700',
   hn_comment: 'bg-orange-100 text-orange-700',
   job_posting: 'bg-green-100 text-green-700',
@@ -59,8 +54,7 @@ const SIGNAL_COLORS: Partial<Record<SignalSource, string>> = {
   product_hunt: 'bg-orange-100 text-orange-700',
   youtube_review: 'bg-red-100 text-red-700',
   discord: 'bg-indigo-100 text-indigo-700',
-  integration_user: 'bg-teal-100 text-teal-700',
-  config_file: 'bg-gray-100 text-gray-700',
+  slack_community: 'bg-purple-100 text-purple-700',
 };
 
 export function SignalBadge({ signal }: { signal: Signal }) {
