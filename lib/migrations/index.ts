@@ -9,141 +9,54 @@ export interface Migration {
 /**
  * All migrations in order. Add new migrations at the end.
  * Never modify existing migrations - only add new ones.
+ *
+ * NOTE: This is a fresh start migration that drops existing data.
  */
 export const migrations: Migration[] = [
   {
     version: 1,
-    name: 'initial_schema',
+    name: 'dashboard_schema',
     sql: `
-      -- Create companies table with flexible JSONB structure
-      CREATE TABLE IF NOT EXISTS companies (
+      -- Drop existing companies table if it exists
+      DROP TABLE IF EXISTS companies CASCADE;
+
+      -- Create new companies table with dashboard schema
+      CREATE TABLE companies (
+        -- Primary Key
         domain TEXT PRIMARY KEY,
+
+        -- Company Identity
         name TEXT NOT NULL,
         logo_url TEXT,
 
-        -- Flexible JSONB columns for each tab (schema can evolve)
-        summary_data JSONB DEFAULT '{}',
-        summary_updated_at TIMESTAMPTZ,
-        summary_sources TEXT[] DEFAULT '{}',
+        -- Dashboard Tab Data (JSONB)
+        dashboard_data JSONB,
+        dashboard_updated_at TIMESTAMPTZ,
+        dashboard_sources TEXT[],
 
-        product_data JSONB DEFAULT '{}',
+        -- Product Tab Data (for future Tab 2)
+        product_data JSONB,
         product_updated_at TIMESTAMPTZ,
-        product_sources TEXT[] DEFAULT '{}',
+        product_sources TEXT[],
 
-        business_data JSONB DEFAULT '{}',
+        -- Business Tab Data (for future Tab 3)
+        business_data JSONB,
         business_updated_at TIMESTAMPTZ,
-        business_sources TEXT[] DEFAULT '{}',
+        business_sources TEXT[],
 
-        people_data JSONB DEFAULT '{}',
-        people_updated_at TIMESTAMPTZ,
-        people_sources TEXT[] DEFAULT '{}',
+        -- Person Tab Data (for future Tab 4)
+        person_data JSONB,
+        person_updated_at TIMESTAMPTZ,
+        person_sources TEXT[],
 
         -- Metadata
-        schema_version INTEGER DEFAULT 1,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
 
-      -- Indexes for common queries
-      CREATE INDEX IF NOT EXISTS idx_companies_domain ON companies(domain);
-      CREATE INDEX IF NOT EXISTS idx_companies_updated ON companies(updated_at DESC);
-      CREATE INDEX IF NOT EXISTS idx_companies_summary_updated ON companies(summary_updated_at DESC);
-    `,
-  },
-  {
-    version: 2,
-    name: 'add_missing_columns',
-    sql: `
-      -- Add columns if they don't exist (for existing tables)
-      DO $$
-      BEGIN
-        -- Summary columns
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'summary_data') THEN
-          ALTER TABLE companies ADD COLUMN summary_data JSONB DEFAULT '{}';
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'summary_updated_at') THEN
-          ALTER TABLE companies ADD COLUMN summary_updated_at TIMESTAMPTZ;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'summary_sources') THEN
-          ALTER TABLE companies ADD COLUMN summary_sources TEXT[] DEFAULT '{}';
-        END IF;
-
-        -- Product columns
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'product_data') THEN
-          ALTER TABLE companies ADD COLUMN product_data JSONB DEFAULT '{}';
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'product_updated_at') THEN
-          ALTER TABLE companies ADD COLUMN product_updated_at TIMESTAMPTZ;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'product_sources') THEN
-          ALTER TABLE companies ADD COLUMN product_sources TEXT[] DEFAULT '{}';
-        END IF;
-
-        -- Business columns
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'business_data') THEN
-          ALTER TABLE companies ADD COLUMN business_data JSONB DEFAULT '{}';
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'business_updated_at') THEN
-          ALTER TABLE companies ADD COLUMN business_updated_at TIMESTAMPTZ;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'business_sources') THEN
-          ALTER TABLE companies ADD COLUMN business_sources TEXT[] DEFAULT '{}';
-        END IF;
-
-        -- People columns
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'people_data') THEN
-          ALTER TABLE companies ADD COLUMN people_data JSONB DEFAULT '{}';
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'people_updated_at') THEN
-          ALTER TABLE companies ADD COLUMN people_updated_at TIMESTAMPTZ;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'people_sources') THEN
-          ALTER TABLE companies ADD COLUMN people_sources TEXT[] DEFAULT '{}';
-        END IF;
-
-        -- Metadata columns
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'schema_version') THEN
-          ALTER TABLE companies ADD COLUMN schema_version INTEGER DEFAULT 1;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'created_at') THEN
-          ALTER TABLE companies ADD COLUMN created_at TIMESTAMPTZ DEFAULT NOW();
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'updated_at') THEN
-          ALTER TABLE companies ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
-        END IF;
-      END $$;
-
-      -- Drop old columns if they exist (cleanup from old schema)
-      DO $$
-      BEGIN
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab1_data') THEN
-          ALTER TABLE companies DROP COLUMN tab1_data;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab1_updated_at') THEN
-          ALTER TABLE companies DROP COLUMN tab1_updated_at;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab1_sources') THEN
-          ALTER TABLE companies DROP COLUMN tab1_sources;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab2_data') THEN
-          ALTER TABLE companies DROP COLUMN tab2_data;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab2_updated_at') THEN
-          ALTER TABLE companies DROP COLUMN tab2_updated_at;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab2_sources') THEN
-          ALTER TABLE companies DROP COLUMN tab2_sources;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab3_data') THEN
-          ALTER TABLE companies DROP COLUMN tab3_data;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab3_updated_at') THEN
-          ALTER TABLE companies DROP COLUMN tab3_updated_at;
-        END IF;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'companies' AND column_name = 'tab3_sources') THEN
-          ALTER TABLE companies DROP COLUMN tab3_sources;
-        END IF;
-      END $$;
+      -- Create indexes for faster queries
+      CREATE INDEX IF NOT EXISTS idx_companies_dashboard_updated ON companies(dashboard_updated_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_companies_created ON companies(created_at DESC);
     `,
   },
 ];
@@ -248,4 +161,11 @@ export async function getMigrationStatus(): Promise<{
     latest,
     pending: latest - current,
   };
+}
+
+/**
+ * Get raw SQL for manual execution
+ */
+export function getMigrationSQL(): string {
+  return migrations.map(m => `-- Migration v${m.version}: ${m.name}\n${m.sql}`).join('\n\n');
 }

@@ -6,310 +6,299 @@ export interface Company {
   domain: string;
   name: string;
   logo_url: string | null;
-  summary_data: SummaryData | null;
-  summary_updated_at: string | null;
-  summary_sources: string[];
+  dashboard_data: DashboardData | null;
+  dashboard_updated_at: string | null;
+  dashboard_sources: string[];
   product_data: ProductData | null;
   product_updated_at: string | null;
   product_sources: string[];
   business_data: BusinessData | null;
   business_updated_at: string | null;
   business_sources: string[];
-  people_data: PeopleData | null;
-  people_updated_at: string | null;
-  people_sources: string[];
+  person_data: PersonData | null;
+  person_updated_at: string | null;
+  person_sources: string[];
   created_at: string;
   updated_at: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TAB 1: SUMMARY - "Should I dig deeper?"
+// TAB 1: DASHBOARD - "Full company briefing at a glance"
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export interface SummaryData {
-  // One-liner + Category
-  one_liner: string;
-  category_tags: string[]; // e.g., ["CRM", "Sales Automation", "B2B SaaS"]
-  platforms: string[]; // e.g., ["Web", "iOS", "Android", "Chrome Extension"]
-
-  // ICP + Personas
-  icp_chips: string[]; // e.g., ["SMB Sales Teams", "Enterprise RevOps", "SaaS Startups"]
-  personas: {
-    users: PersonaSummary[];
-    buyers: PersonaSummary[];
+export interface DashboardData {
+  // Card 1: Positioning + ICP
+  positioning: {
+    one_liner: string;
+    category_tags: string[];
+    primary_personas: PersonaChip[];
+    top_jobs: string[]; // Top 3 JTBD
   };
 
-  // Use Cases
-  top_use_cases: UseCase[];
-
-  // Competitive Position
-  why_they_win: string[]; // 3 bullets
-  where_they_lose: string[]; // 3 bullets
-
-  // Product Map
-  product_map: ProductModule[];
-
-  // Pricing
-  pricing_at_glance: {
-    has_free_tier: boolean;
-    free_tier_description: string | null;
-    starting_price: string | null; // e.g., "$49/user/month"
-    enterprise_gates: string[]; // e.g., ["SSO", "SAML", "Custom SLAs"]
-    pricing_model: 'per_seat' | 'usage_based' | 'flat_rate' | 'hybrid' | 'unknown';
+  // Card 2: Product Reality
+  product_reality: {
+    feature_area_coverage: FeatureAreaCoverage[];
+    top_capabilities: string[]; // Top 5
+    integration_count: number;
+    top_integration_categories: string[];
   };
 
-  // Key Signals
-  signals: {
-    funding_stage: string | null; // e.g., "Series B"
-    total_funding: string | null;
-    last_funding_date: string | null;
-    headcount: number | null;
-    headcount_trend: 'growing' | 'stable' | 'shrinking' | null;
-    hiring_mix: HiringMix | null;
+  // Card 3: Monetization + Gating
+  monetization: {
+    pricing_model: PricingModel;
+    plans: PlanSummary[];
+    enterprise_gates: EnterpriseGate[];
+    hard_limits: string[]; // Top 3 highlights
   };
 
-  // Recent Changes
-  recent_changes: {
-    thirty_days: RecentChange[];
-    ninety_days: RecentChange[];
+  // Card 4: Momentum
+  momentum: {
+    sparkline_data: MomentumPoint[];
+    summary_sentence: string;
+    signals: MomentumSignal[];
   };
+
+  // Below fold: Timeline
+  timeline: TimelineEvent[];
+
+  // Below fold: Customer Voice
+  customer_voice: {
+    positive_themes: string[]; // 3
+    negative_themes: string[]; // 3
+    sources: string[];
+  };
+
+  // Below fold: Competitive Snapshot
+  competitive: {
+    competitors: CompetitorSummary[]; // Top 3
+  };
+
+  // Below fold: Risk Flags (conditional)
+  risks: Risk[]; // Only medium/high severity
 
   // Metadata
   generated_at: string;
 }
 
-export interface PersonaSummary {
-  title: string; // e.g., "Sales Development Rep"
-  seniority: 'ic' | 'manager' | 'director' | 'vp' | 'c_level';
-  department: string;
-}
-
-export interface UseCase {
-  title: string;
-  description: string;
-  persona_fit: string[];
-}
-
-export interface ProductModule {
+// Dashboard supporting types
+export interface PersonaChip {
   name: string;
-  description: string;
-  key_features: string[];
+  type: 'user' | 'buyer' | 'admin';
 }
 
-export interface HiringMix {
-  engineering_pct: number;
-  sales_pct: number;
-  product_pct: number;
-  other_pct: number;
+export interface FeatureAreaCoverage {
+  area: string;
+  coverage_percent: number;
 }
 
-export interface RecentChange {
-  type: 'product_launch' | 'pricing_change' | 'acquisition' | 'funding' | 'leadership' | 'partnership' | 'positioning';
-  title: string;
+export interface PlanSummary {
+  name: string;
+  price_display: string;
+  key_feature: string;
+}
+
+export type EnterpriseGateName = 'SSO' | 'SCIM' | 'RBAC' | 'Audit Logs' | 'Data Residency';
+
+export interface EnterpriseGate {
+  name: EnterpriseGateName;
+  available: boolean;
+  plan?: string;
+}
+
+export interface MomentumPoint {
   date: string;
-  source_url: string | null;
+  value: number;
+  type: 'headcount' | 'events' | 'hiring';
 }
+
+export interface MomentumSignal {
+  type: string;
+  value: string;
+  trend?: 'up' | 'down' | 'stable';
+}
+
+export type TimelineEventType = 'product' | 'pricing' | 'gtm' | 'security';
+
+export interface TimelineEvent {
+  id: string;
+  date: string;
+  type: TimelineEventType;
+  title: string;
+  description?: string;
+  source_url?: string;
+}
+
+export type CompetitorType = 'direct' | 'adjacent' | 'replacement';
+
+export interface CompetitorSummary {
+  name: string;
+  type: CompetitorType;
+  wedge: string; // 1-line differentiation
+}
+
+export type RiskType = 'security' | 'reliability' | 'platform' | 'regulatory' | 'pricing';
+export type RiskSeverity = 'medium' | 'high';
+
+export interface Risk {
+  type: RiskType;
+  severity: RiskSeverity;
+  description: string;
+}
+
+export type PricingModel = 'seat' | 'usage' | 'subscription' | 'transaction' | 'hybrid' | 'unknown';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TAB 2: PRODUCT - "How it actually works"
+// TAB 2: PRODUCT - "How it actually works" (placeholder for future)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export interface ProductData {
   // Feature Map grouped by workflow stage
   feature_map: {
     onboarding: Feature[];
-    core_action: Feature[];
+    core_workflow: Feature[];
     collaboration: Feature[];
-    reporting: Feature[];
+    analytics: Feature[];
     admin: Feature[];
   };
-
-  // Filter metadata
-  available_personas: string[];
-  available_plan_gates: string[];
-  available_feature_areas: string[];
 
   // Personas (detailed)
   personas: PersonaDetail[];
 
   // Integrations
   integrations: {
-    top_integrations: Integration[];
-    categories: IntegrationCategory[];
+    items: Integration[];
     total_count: number;
   };
 
-  // Generated at
+  // Metadata
   generated_at: string;
 }
 
 export interface Feature {
+  id: string;
   name: string;
   description: string;
-  personas: string[]; // which personas use it
-  plan_gate: 'free' | 'starter' | 'pro' | 'enterprise' | 'all';
   feature_area: string;
-  is_new: boolean;
-  is_updated: boolean;
-  update_date: string | null;
+  personas: string[];
+  plan_gate: 'free' | 'starter' | 'pro' | 'enterprise' | 'all';
+  status: 'launched' | 'beta' | 'deprecated';
+  evidence_url?: string;
 }
 
 export interface PersonaDetail {
-  title: string;
-  seniority: 'ic' | 'manager' | 'director' | 'vp' | 'c_level';
-  department: string;
+  id: string;
+  name: string;
+  type: 'user' | 'buyer' | 'admin';
+  role?: string;
+  goals: string[];
+  pains: string[];
   jobs_to_be_done: string[];
-  key_features_used: string[];
-  pain_points_solved: string[];
+  key_features: string[];
 }
 
 export interface Integration {
+  id: string;
   name: string;
   category: string;
-  depth: 'native' | 'api' | 'zapier_only' | 'partner';
-  description: string;
-  logo_url: string | null;
-}
-
-export interface IntegrationCategory {
-  name: string;
-  count: number;
+  depth: 'shallow' | 'deep';
+  description?: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TAB 3: BUSINESS - "Can they win and how do they make money"
+// TAB 3: BUSINESS - "Strategic and competitive intelligence" (placeholder)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export interface BusinessData {
+  // GTM Profile
+  gtm: {
+    motion: 'plg' | 'sales_led' | 'hybrid';
+    primary_buyer_roles: string[];
+    acquisition_channels: string[];
+    implementation_model: 'self_serve' | 'assisted' | 'ps_heavy';
+    expansion_levers: string[];
+  };
+
   // Pricing & Packaging
   pricing: {
-    plans: PricingPlan[];
-    enterprise_info: {
-      has_enterprise: boolean;
-      contact_sales: boolean;
-      known_features: string[];
-    };
-    trial_info: {
-      has_free_trial: boolean;
-      trial_length_days: number | null;
-      requires_credit_card: boolean | null;
-    };
-    pricing_page_url: string | null;
+    plans: PricingPlanDetail[];
+    pricing_history: PricingHistoryEvent[];
   };
 
-  // Competitive Landscape
-  competitive: {
-    direct_competitors: Competitor[];
-    alternatives: Competitor[];
-    differentiators: string[];
-    competitive_positioning: string;
+  // Competition
+  competition: {
+    competitors: CompetitorDetail[];
+    feature_parity_summary: string;
+    differentiation_durability: 'easy_to_copy' | 'moderate' | 'hard_to_copy';
   };
 
-  // Traction Signals
-  traction: {
-    funding: FundingInfo;
-    hiring: HiringInfo;
-    web_proxies: WebProxy;
-    customer_proof: CustomerProof;
+  // Signals
+  signals: {
+    funding: FundingSignal | null;
+    hiring: HiringSignal | null;
+    web_footprint: WebSignal | null;
+    reliability: ReliabilitySignal | null;
   };
 
-  // Timeline (filterable feed)
-  timeline: TimelineEvent[];
-
-  // Sources
-  sources: SourceReference[];
-
-  // Generated at
+  // Metadata
   generated_at: string;
 }
 
-export interface PricingPlan {
+export interface PricingPlanDetail {
   name: string;
-  price: string | null; // e.g., "$49/month" or "Custom"
-  billing_cycle: 'monthly' | 'annual' | 'custom' | null;
-  limits: PlanLimit[];
+  price_display: string;
+  billing_terms: string[];
+  limits: { name: string; value: string }[];
   key_features: string[];
-  target_audience: string | null;
+  enterprise_gates: string[];
 }
 
-export interface PlanLimit {
-  name: string;
-  value: string;
-}
-
-export interface Competitor {
-  name: string;
-  domain: string | null;
-  description: string;
-  positioning: string;
-}
-
-export interface FundingInfo {
-  total_raised: string | null;
-  last_round: string | null;
-  last_round_date: string | null;
-  last_round_amount: string | null;
-  investors: string[];
-  valuation: string | null;
-}
-
-export interface HiringInfo {
-  total_open_roles: number;
-  velocity: 'accelerating' | 'stable' | 'slowing' | 'unknown';
-  key_hires_focus: string[];
-  careers_url: string | null;
-}
-
-export interface WebProxy {
-  estimated_traffic: string | null;
-  traffic_trend: 'up' | 'stable' | 'down' | 'unknown';
-}
-
-export interface CustomerProof {
-  notable_customers: string[];
-  case_studies_count: number;
-  testimonials_count: number;
-}
-
-export interface TimelineEvent {
-  type: 'pricing_change' | 'product_launch' | 'funding' | 'acquisition' | 'leadership' | 'partnership' | 'repositioning';
-  title: string;
-  description: string;
+export interface PricingHistoryEvent {
   date: string;
-  source_url: string | null;
-  source_name: string;
+  change_type: 'new_plan' | 'price_change' | 'feature_change' | 'limit_change';
+  description: string;
 }
 
-export interface SourceReference {
+export interface CompetitorDetail {
   name: string;
-  url: string;
-  type: 'official' | 'review' | 'news' | 'social' | 'community';
-  last_accessed: string;
+  domain?: string;
+  type: CompetitorType;
+  overlap_jobs: string[];
+  win_reasons: string[];
+  lose_reasons: string[];
+}
+
+export interface FundingSignal {
+  stage: string;
+  total_raised: string;
+  last_round_date?: string;
+  investors: string[];
+}
+
+export interface HiringSignal {
+  total_open_roles: number;
+  velocity: 'accelerating' | 'stable' | 'slowing';
+  focus_areas: string[];
+}
+
+export interface WebSignal {
+  traffic_estimate: string;
+  trend: 'up' | 'stable' | 'down';
+}
+
+export interface ReliabilitySignal {
+  incidents_30d: number;
+  uptime_percent?: number;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TAB 4: PEOPLE - "Users who have used the product"
+// TAB 4: PERSON - "Users and buyers discovered" (placeholder)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export interface PeopleData {
-  summary: {
-    total_people_found: number;
-    users_count: number;
-    buyers_count: number;
-    high_confidence_count: number;
-    medium_confidence_count: number;
-    low_confidence_count: number;
-    signals_collected: number;
-    sources_searched: string[];
-  };
-
+export interface PersonData {
   users: DiscoveredPerson[];
   buyers: DiscoveredPerson[];
-
   companies_using: CompanyUsing[];
-
-  collected_at: string;
-  collection_time_ms: number;
+  generated_at: string;
 }
 
 export interface DiscoveredPerson {
@@ -317,61 +306,32 @@ export interface DiscoveredPerson {
   name: string;
   company: string | null;
   role: string | null;
-
-  // Type classification
-  person_type: 'user' | 'buyer' | 'evaluator' | 'unknown';
-
-  // Contact info
+  type: 'user' | 'buyer' | 'evaluator';
   linkedin_url: string | null;
-  twitter_handle: string | null;
-  email: string | null;
-
-  // Scoring
   confidence_score: number;
-  signal_count: number;
-
-  // Persona tags
-  persona_tags: string[];
-
-  // Evidence
   signals: PersonSignal[];
 }
 
 export interface PersonSignal {
-  source: SignalSource;
-  tier: 1 | 2 | 3;
+  source: string;
   text: string;
   url: string;
   date: string | null;
-  confidence: number;
-  indicates_usage: boolean;
-  indicates_purchase_authority: boolean;
 }
 
 export interface CompanyUsing {
   name: string;
   domain: string | null;
-  logo_url: string | null;
   industry: string | null;
   size: string | null;
-  signal_count: number;
   confidence: 'high' | 'medium' | 'low';
 }
-
-export type SignalSource =
-  | 'g2_review' | 'capterra_review' | 'trustradius_review'
-  | 'linkedin_post' | 'twitter_post' | 'testimonial'
-  | 'case_study' | 'product_hunt' | 'youtube_review'
-  | 'github_issue' | 'github_discussion' | 'stackoverflow'
-  | 'reddit_post' | 'reddit_comment' | 'hn_comment'
-  | 'forum_post' | 'discord' | 'slack_community'
-  | 'job_posting' | 'logo_wall' | 'press_mention';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API TYPES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export type TabId = 'summary' | 'product' | 'business' | 'people';
+export type TabId = 'dashboard' | 'product' | 'business' | 'person';
 
 export interface CompanyResponse {
   company: {
@@ -379,10 +339,10 @@ export interface CompanyResponse {
     name: string;
     logo_url: string | null;
   };
-  summary: TabData<SummaryData>;
+  dashboard: TabData<DashboardData>;
   product: TabData<ProductData>;
   business: TabData<BusinessData>;
-  people: TabData<PeopleData>;
+  person: TabData<PersonData>;
 }
 
 export interface TabData<T> {
@@ -395,7 +355,7 @@ export interface TabData<T> {
 // Streaming event types
 export type StreamEvent =
   | { type: 'tab_started'; tab: TabId }
-  | { type: 'tab_complete'; tab: TabId; data: SummaryData | ProductData | BusinessData | PeopleData; sources: string[] }
+  | { type: 'tab_complete'; tab: TabId; data: DashboardData | ProductData | BusinessData | PersonData; sources: string[] }
   | { type: 'tab_error'; tab: TabId; error: string }
   | { type: 'all_complete' }
   | { type: 'company_info'; name: string; logo_url: string | null }
@@ -415,36 +375,41 @@ export interface AutocompleteResult {
 // EMPTY DATA FACTORIES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export function getEmptySummaryData(): SummaryData {
+export function getEmptyDashboardData(): DashboardData {
   return {
-    one_liner: '',
-    category_tags: [],
-    platforms: [],
-    icp_chips: [],
-    personas: { users: [], buyers: [] },
-    top_use_cases: [],
-    why_they_win: [],
-    where_they_lose: [],
-    product_map: [],
-    pricing_at_glance: {
-      has_free_tier: false,
-      free_tier_description: null,
-      starting_price: null,
-      enterprise_gates: [],
+    positioning: {
+      one_liner: '',
+      category_tags: [],
+      primary_personas: [],
+      top_jobs: [],
+    },
+    product_reality: {
+      feature_area_coverage: [],
+      top_capabilities: [],
+      integration_count: 0,
+      top_integration_categories: [],
+    },
+    monetization: {
       pricing_model: 'unknown',
+      plans: [],
+      enterprise_gates: [],
+      hard_limits: [],
     },
-    signals: {
-      funding_stage: null,
-      total_funding: null,
-      last_funding_date: null,
-      headcount: null,
-      headcount_trend: null,
-      hiring_mix: null,
+    momentum: {
+      sparkline_data: [],
+      summary_sentence: '',
+      signals: [],
     },
-    recent_changes: {
-      thirty_days: [],
-      ninety_days: [],
+    timeline: [],
+    customer_voice: {
+      positive_themes: [],
+      negative_themes: [],
+      sources: [],
     },
+    competitive: {
+      competitors: [],
+    },
+    risks: [],
     generated_at: new Date().toISOString(),
   };
 }
@@ -453,18 +418,14 @@ export function getEmptyProductData(): ProductData {
   return {
     feature_map: {
       onboarding: [],
-      core_action: [],
+      core_workflow: [],
       collaboration: [],
-      reporting: [],
+      analytics: [],
       admin: [],
     },
-    available_personas: [],
-    available_plan_gates: [],
-    available_feature_areas: [],
     personas: [],
     integrations: {
-      top_integrations: [],
-      categories: [],
+      items: [],
       total_count: 0,
     },
     generated_at: new Date().toISOString(),
@@ -473,73 +434,37 @@ export function getEmptyProductData(): ProductData {
 
 export function getEmptyBusinessData(): BusinessData {
   return {
+    gtm: {
+      motion: 'hybrid',
+      primary_buyer_roles: [],
+      acquisition_channels: [],
+      implementation_model: 'self_serve',
+      expansion_levers: [],
+    },
     pricing: {
       plans: [],
-      enterprise_info: {
-        has_enterprise: false,
-        contact_sales: false,
-        known_features: [],
-      },
-      trial_info: {
-        has_free_trial: false,
-        trial_length_days: null,
-        requires_credit_card: null,
-      },
-      pricing_page_url: null,
+      pricing_history: [],
     },
-    competitive: {
-      direct_competitors: [],
-      alternatives: [],
-      differentiators: [],
-      competitive_positioning: '',
+    competition: {
+      competitors: [],
+      feature_parity_summary: '',
+      differentiation_durability: 'moderate',
     },
-    traction: {
-      funding: {
-        total_raised: null,
-        last_round: null,
-        last_round_date: null,
-        last_round_amount: null,
-        investors: [],
-        valuation: null,
-      },
-      hiring: {
-        total_open_roles: 0,
-        velocity: 'unknown',
-        key_hires_focus: [],
-        careers_url: null,
-      },
-      web_proxies: {
-        estimated_traffic: null,
-        traffic_trend: 'unknown',
-      },
-      customer_proof: {
-        notable_customers: [],
-        case_studies_count: 0,
-        testimonials_count: 0,
-      },
+    signals: {
+      funding: null,
+      hiring: null,
+      web_footprint: null,
+      reliability: null,
     },
-    timeline: [],
-    sources: [],
     generated_at: new Date().toISOString(),
   };
 }
 
-export function getEmptyPeopleData(): PeopleData {
+export function getEmptyPersonData(): PersonData {
   return {
-    summary: {
-      total_people_found: 0,
-      users_count: 0,
-      buyers_count: 0,
-      high_confidence_count: 0,
-      medium_confidence_count: 0,
-      low_confidence_count: 0,
-      signals_collected: 0,
-      sources_searched: [],
-    },
     users: [],
     buyers: [],
     companies_using: [],
-    collected_at: new Date().toISOString(),
-    collection_time_ms: 0,
+    generated_at: new Date().toISOString(),
   };
 }

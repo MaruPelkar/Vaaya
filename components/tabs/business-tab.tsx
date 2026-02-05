@@ -1,21 +1,11 @@
 'use client';
 
-import { BusinessData, TimelineEvent } from '@/lib/types';
+import { BusinessData } from '@/lib/types';
 import { Chip } from '../ui/chip';
 
 interface BusinessTabProps {
   data: BusinessData | null;
 }
-
-const EVENT_COLORS: Record<TimelineEvent['type'], string> = {
-  pricing_change: 'bg-amber-100 text-amber-700',
-  product_launch: 'bg-green-100 text-green-700',
-  funding: 'bg-blue-100 text-blue-700',
-  acquisition: 'bg-purple-100 text-purple-700',
-  leadership: 'bg-pink-100 text-pink-700',
-  partnership: 'bg-cyan-100 text-cyan-700',
-  repositioning: 'bg-orange-100 text-orange-700',
-};
 
 export function BusinessTab({ data }: BusinessTabProps) {
   if (!data) {
@@ -26,50 +16,114 @@ export function BusinessTab({ data }: BusinessTabProps) {
     );
   }
 
+  const hasGTM = data.gtm.primary_buyer_roles.length > 0 || data.gtm.acquisition_channels.length > 0;
   const hasPlans = data.pricing.plans.length > 0;
-  const hasCompetitors = data.competitive.direct_competitors.length > 0 || data.competitive.alternatives.length > 0;
-  const hasTimeline = data.timeline.length > 0;
-  const hasFunding = data.traction.funding.total_raised || data.traction.funding.last_round;
+  const hasCompetitors = data.competition.competitors.length > 0;
+  const hasSignals = data.signals.funding || data.signals.hiring || data.signals.web_footprint;
+
+  // Empty state when no data
+  if (!hasGTM && !hasPlans && !hasCompetitors && !hasSignals) {
+    return (
+      <div className="text-center py-12" style={{ color: 'var(--vaaya-text-muted)' }}>
+        <div className="text-4xl mb-4">📊</div>
+        <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--vaaya-text)' }}>Business Tab Coming Soon</h3>
+        <p>Strategic and competitive intelligence will appear here.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
+      {/* GTM Profile */}
+      {hasGTM && (
+        <section>
+          <h3 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--vaaya-text)' }}>
+            GTM Profile
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bento-box rounded-lg p-6 shadow-sm">
+              <div className="text-xs uppercase font-medium mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
+                Motion
+              </div>
+              <span
+                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                style={{
+                  backgroundColor: 'rgba(7, 59, 57, 0.1)',
+                  color: 'var(--vaaya-brand)',
+                }}
+              >
+                {data.gtm.motion === 'plg' ? 'Product-Led Growth' :
+                 data.gtm.motion === 'sales_led' ? 'Sales-Led' : 'Hybrid'}
+              </span>
+              <div className="mt-4 text-sm" style={{ color: 'var(--vaaya-text-muted)' }}>
+                Implementation: <span style={{ color: 'var(--vaaya-text)' }}>
+                  {data.gtm.implementation_model === 'self_serve' ? 'Self-Serve' :
+                   data.gtm.implementation_model === 'assisted' ? 'Assisted' : 'Professional Services'}
+                </span>
+              </div>
+            </div>
+
+            <div className="bento-box rounded-lg p-6 shadow-sm">
+              <div className="text-xs uppercase font-medium mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
+                Buyer Roles
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {data.gtm.primary_buyer_roles.map((role, i) => (
+                  <Chip key={i} variant="persona">{role}</Chip>
+                ))}
+              </div>
+            </div>
+
+            {data.gtm.acquisition_channels.length > 0 && (
+              <div className="bento-box rounded-lg p-6 shadow-sm">
+                <div className="text-xs uppercase font-medium mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  Acquisition Channels
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {data.gtm.acquisition_channels.map((channel, i) => (
+                    <Chip key={i} variant="category">{channel}</Chip>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {data.gtm.expansion_levers.length > 0 && (
+              <div className="bento-box rounded-lg p-6 shadow-sm">
+                <div className="text-xs uppercase font-medium mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  Expansion Levers
+                </div>
+                <ul className="space-y-1">
+                  {data.gtm.expansion_levers.map((lever, i) => (
+                    <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--vaaya-text)' }}>
+                      <span style={{ color: 'var(--vaaya-brand)' }}>•</span>
+                      {lever}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Pricing & Packaging */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-2xl font-semibold" style={{ color: 'var(--vaaya-text)' }}>
+      {hasPlans && (
+        <section>
+          <h3 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--vaaya-text)' }}>
             Pricing & Packaging
           </h3>
-          {data.pricing.pricing_page_url && (
-            <a
-              href={data.pricing.pricing_page_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm hover:underline"
-              style={{ color: 'var(--vaaya-brand)' }}
-            >
-              View Pricing Page →
-            </a>
-          )}
-        </div>
-
-        {hasPlans ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {data.pricing.plans.map((plan, i) => (
               <div key={i} className="bento-box rounded-lg p-6 shadow-sm">
                 <div className="font-bold text-lg mb-2" style={{ color: 'var(--vaaya-text)' }}>
                   {plan.name}
                 </div>
                 <div className="text-2xl font-bold mb-1" style={{ color: 'var(--vaaya-brand)' }}>
-                  {plan.price || 'Contact Sales'}
+                  {plan.price_display || 'Contact Sales'}
                 </div>
-                {plan.billing_cycle && (
+                {plan.billing_terms.length > 0 && (
                   <div className="text-xs mb-4" style={{ color: 'var(--vaaya-text-muted)' }}>
-                    {plan.billing_cycle}
-                  </div>
-                )}
-                {plan.target_audience && (
-                  <div className="text-sm mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
-                    For: {plan.target_audience}
+                    {plan.billing_terms.join(', ')}
                   </div>
                 )}
 
@@ -84,340 +138,151 @@ export function BusinessTab({ data }: BusinessTabProps) {
                   </ul>
                 )}
 
-                {plan.limits.length > 0 && (
+                {plan.enterprise_gates.length > 0 && (
                   <div className="pt-3 border-t" style={{ borderColor: 'var(--vaaya-border)' }}>
-                    <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                      Limits
+                    <div className="flex flex-wrap gap-1">
+                      {plan.enterprise_gates.map((gate, j) => (
+                        <Chip key={j} variant="small">{gate}</Chip>
+                      ))}
                     </div>
-                    {plan.limits.slice(0, 3).map((limit, j) => (
-                      <div key={j} className="text-xs flex justify-between" style={{ color: 'var(--vaaya-text-muted)' }}>
-                        <span>{limit.name}</span>
-                        <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>{limit.value}</span>
-                      </div>
-                    ))}
                   </div>
                 )}
               </div>
             ))}
           </div>
-        ) : (
-          <div className="bento-box rounded-lg p-8 text-center mb-6" style={{ color: 'var(--vaaya-text-muted)' }}>
-            No pricing plans identified
-          </div>
-        )}
-
-        {/* Trial & Enterprise Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bento-box rounded-lg p-4 shadow-sm">
-            <h4 className="text-sm font-bold uppercase mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
-              Trial Info
-            </h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span style={{ color: 'var(--vaaya-text-muted)' }}>Free Trial</span>
-                <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>
-                  {data.pricing.trial_info.has_free_trial ? 'Yes' : 'No'}
-                </span>
-              </div>
-              {data.pricing.trial_info.trial_length_days && (
-                <div className="flex justify-between">
-                  <span style={{ color: 'var(--vaaya-text-muted)' }}>Trial Length</span>
-                  <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>
-                    {data.pricing.trial_info.trial_length_days} days
-                  </span>
-                </div>
-              )}
-              {data.pricing.trial_info.requires_credit_card !== null && (
-                <div className="flex justify-between">
-                  <span style={{ color: 'var(--vaaya-text-muted)' }}>Credit Card Required</span>
-                  <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>
-                    {data.pricing.trial_info.requires_credit_card ? 'Yes' : 'No'}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="bento-box rounded-lg p-4 shadow-sm">
-            <h4 className="text-sm font-bold uppercase mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
-              Enterprise
-            </h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span style={{ color: 'var(--vaaya-text-muted)' }}>Enterprise Plan</span>
-                <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>
-                  {data.pricing.enterprise_info.has_enterprise ? 'Yes' : 'No'}
-                </span>
-              </div>
-              {data.pricing.enterprise_info.contact_sales && (
-                <div className="flex justify-between">
-                  <span style={{ color: 'var(--vaaya-text-muted)' }}>Contact Sales</span>
-                  <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>Required</span>
-                </div>
-              )}
-              {data.pricing.enterprise_info.known_features.length > 0 && (
-                <div className="pt-2">
-                  <div className="flex flex-wrap gap-1">
-                    {data.pricing.enterprise_info.known_features.slice(0, 5).map((f, i) => (
-                      <Chip key={i} variant="small">{f}</Chip>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Competitive Landscape */}
-      {hasCompetitors && (
-        <section>
-          <h3 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--vaaya-text)' }}>
-            Competitive Landscape
-          </h3>
-
-          {data.competitive.competitive_positioning && (
-            <div className="bento-box rounded-lg p-6 mb-6 shadow-sm" style={{ borderLeft: '4px solid var(--vaaya-brand)' }}>
-              <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                Positioning
-              </div>
-              <p style={{ color: 'var(--vaaya-text)' }}>{data.competitive.competitive_positioning}</p>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Direct Competitors */}
-            {data.competitive.direct_competitors.length > 0 && (
-              <div>
-                <h4 className="text-sm font-bold uppercase tracking-wide mb-4" style={{ color: 'var(--vaaya-text-muted)' }}>
-                  Direct Competitors
-                </h4>
-                <div className="space-y-3">
-                  {data.competitive.direct_competitors.map((comp, i) => (
-                    <div key={i} className="bento-box rounded-lg p-4 shadow-sm">
-                      <div className="font-bold text-sm mb-1" style={{ color: 'var(--vaaya-text)' }}>
-                        {comp.name}
-                      </div>
-                      <p className="text-xs mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                        {comp.description}
-                      </p>
-                      <div className="text-xs" style={{ color: 'var(--vaaya-brand)' }}>
-                        {comp.positioning}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Alternatives */}
-            {data.competitive.alternatives.length > 0 && (
-              <div>
-                <h4 className="text-sm font-bold uppercase tracking-wide mb-4" style={{ color: 'var(--vaaya-text-muted)' }}>
-                  Alternatives
-                </h4>
-                <div className="space-y-3">
-                  {data.competitive.alternatives.map((alt, i) => (
-                    <div key={i} className="bento-box rounded-lg p-4 shadow-sm">
-                      <div className="font-bold text-sm mb-1" style={{ color: 'var(--vaaya-text)' }}>
-                        {alt.name}
-                      </div>
-                      <p className="text-xs mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                        {alt.description}
-                      </p>
-                      <div className="text-xs" style={{ color: 'var(--vaaya-brand)' }}>
-                        {alt.positioning}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Differentiators */}
-          {data.competitive.differentiators.length > 0 && (
-            <div className="mt-6">
-              <h4 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
-                Key Differentiators
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {data.competitive.differentiators.map((diff, i) => (
-                  <Chip key={i} variant="category">{diff}</Chip>
-                ))}
-              </div>
-            </div>
-          )}
         </section>
       )}
 
-      {/* Traction Signals */}
-      <section>
-        <h3 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--vaaya-text)' }}>
-          Traction Signals
-        </h3>
+      {/* Competition */}
+      {hasCompetitors && (
+        <section>
+          <h3 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--vaaya-text)' }}>
+            Competition
+          </h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Funding */}
-          {hasFunding && (
-            <div className="bento-box rounded-lg p-4 shadow-sm">
+          {data.competition.feature_parity_summary && (
+            <div className="bento-box rounded-lg p-6 mb-6 shadow-sm" style={{ borderLeft: '4px solid var(--vaaya-brand)' }}>
               <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                Funding
+                Feature Parity
               </div>
-              {data.traction.funding.total_raised && (
-                <div className="text-xl font-bold" style={{ color: 'var(--vaaya-brand)' }}>
-                  {data.traction.funding.total_raised}
-                </div>
-              )}
-              {data.traction.funding.last_round && (
-                <div className="text-sm" style={{ color: 'var(--vaaya-text)' }}>
-                  {data.traction.funding.last_round}
-                  {data.traction.funding.last_round_amount && ` (${data.traction.funding.last_round_amount})`}
-                </div>
-              )}
-              {data.traction.funding.investors.length > 0 && (
-                <div className="text-xs mt-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                  {data.traction.funding.investors.slice(0, 3).join(', ')}
-                </div>
-              )}
+              <p style={{ color: 'var(--vaaya-text)' }}>{data.competition.feature_parity_summary}</p>
             </div>
           )}
 
-          {/* Hiring */}
-          <div className="bento-box rounded-lg p-4 shadow-sm">
-            <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-              Hiring
-            </div>
-            <div className="text-xl font-bold" style={{ color: 'var(--vaaya-text)' }}>
-              {data.traction.hiring.total_open_roles} roles
-            </div>
-            <div className={`text-sm ${
-              data.traction.hiring.velocity === 'accelerating' ? 'text-green-600' :
-              data.traction.hiring.velocity === 'slowing' ? 'text-red-600' :
-              ''
-            }`} style={data.traction.hiring.velocity === 'stable' || data.traction.hiring.velocity === 'unknown' ? { color: 'var(--vaaya-text-muted)' } : {}}>
-              {data.traction.hiring.velocity}
-            </div>
-            {data.traction.hiring.key_hires_focus.length > 0 && (
-              <div className="text-xs mt-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                Focus: {data.traction.hiring.key_hires_focus.slice(0, 2).join(', ')}
-              </div>
-            )}
-          </div>
-
-          {/* Web Traffic */}
-          <div className="bento-box rounded-lg p-4 shadow-sm">
-            <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-              Web Traffic
-            </div>
-            <div className="text-xl font-bold" style={{ color: 'var(--vaaya-text)' }}>
-              {data.traction.web_proxies.estimated_traffic || 'Unknown'}
-            </div>
-            <div className={`text-sm ${
-              data.traction.web_proxies.traffic_trend === 'up' ? 'text-green-600' :
-              data.traction.web_proxies.traffic_trend === 'down' ? 'text-red-600' :
-              ''
-            }`} style={data.traction.web_proxies.traffic_trend === 'stable' || data.traction.web_proxies.traffic_trend === 'unknown' ? { color: 'var(--vaaya-text-muted)' } : {}}>
-              {data.traction.web_proxies.traffic_trend === 'up' ? '↑ Growing' :
-               data.traction.web_proxies.traffic_trend === 'down' ? '↓ Declining' :
-               data.traction.web_proxies.traffic_trend === 'stable' ? '→ Stable' : 'Unknown'}
-            </div>
-          </div>
-
-          {/* Customer Proof */}
-          <div className="bento-box rounded-lg p-4 shadow-sm">
-            <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-              Customer Proof
-            </div>
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span style={{ color: 'var(--vaaya-text-muted)' }}>Case Studies</span>
-                <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>
-                  {data.traction.customer_proof.case_studies_count}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span style={{ color: 'var(--vaaya-text-muted)' }}>Testimonials</span>
-                <span className="font-medium" style={{ color: 'var(--vaaya-text)' }}>
-                  {data.traction.customer_proof.testimonials_count}
-                </span>
-              </div>
-            </div>
-            {data.traction.customer_proof.notable_customers.length > 0 && (
-              <div className="text-xs mt-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                {data.traction.customer_proof.notable_customers.slice(0, 3).join(', ')}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline */}
-      {hasTimeline && (
-        <section>
-          <h3 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--vaaya-text)' }}>
-            Timeline
-          </h3>
-          <div className="space-y-3">
-            {data.timeline.map((event, i) => (
-              <div key={i} className="bento-box rounded-lg p-4 shadow-sm flex items-start gap-4">
-                <span className={`text-xs px-2 py-1 rounded font-medium whitespace-nowrap ${EVENT_COLORS[event.type] || 'bg-gray-100 text-gray-700'}`}>
-                  {event.type.replace('_', ' ')}
-                </span>
-                <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {data.competition.competitors.map((comp, i) => (
+              <div key={i} className="bento-box rounded-lg p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
                   <div className="font-bold text-sm" style={{ color: 'var(--vaaya-text)' }}>
-                    {event.title}
+                    {comp.name}
                   </div>
-                  <p className="text-xs mt-1" style={{ color: 'var(--vaaya-text-muted)' }}>
-                    {event.description}
-                  </p>
+                  <Chip variant="small">{comp.type}</Chip>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs" style={{ color: 'var(--vaaya-text-muted)' }}>
-                    {event.date}
+
+                {comp.overlap_jobs.length > 0 && (
+                  <div className="text-xs mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
+                    Overlaps: {comp.overlap_jobs.slice(0, 2).join(', ')}
                   </div>
-                  {event.source_url && (
-                    <a
-                      href={event.source_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs hover:underline"
-                      style={{ color: 'var(--vaaya-brand)' }}
-                    >
-                      {event.source_name || 'Source'}
-                    </a>
-                  )}
-                </div>
+                )}
+
+                {comp.win_reasons.length > 0 && (
+                  <div className="mt-2">
+                    <div className="text-xs text-green-600 mb-1">Win reasons:</div>
+                    <ul className="text-xs space-y-1">
+                      {comp.win_reasons.slice(0, 2).map((reason, j) => (
+                        <li key={j} style={{ color: 'var(--vaaya-text-muted)' }}>• {reason}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Sources */}
-      {data.sources.length > 0 && (
-        <section className="bento-box rounded-lg p-6 shadow-sm">
-          <details>
-            <summary className="text-sm font-bold uppercase cursor-pointer" style={{ color: 'var(--vaaya-text-muted)' }}>
-              Sources ({data.sources.length})
-            </summary>
-            <div className="mt-4 space-y-2">
-              {data.sources.map((source, i) => (
-                <div key={i} className="flex items-center gap-3 text-sm">
-                  <Chip variant="small">{source.type}</Chip>
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline truncate"
-                    style={{ color: 'var(--vaaya-brand)' }}
-                  >
-                    {source.name}
-                  </a>
+      {/* Signals */}
+      {hasSignals && (
+        <section>
+          <h3 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--vaaya-text)' }}>
+            Signals
+          </h3>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Funding */}
+            {data.signals.funding && (
+              <div className="bento-box rounded-lg p-4 shadow-sm">
+                <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  Funding
                 </div>
-              ))}
-            </div>
-          </details>
+                <div className="text-xl font-bold" style={{ color: 'var(--vaaya-brand)' }}>
+                  {data.signals.funding.total_raised}
+                </div>
+                <div className="text-sm" style={{ color: 'var(--vaaya-text)' }}>
+                  {data.signals.funding.stage}
+                </div>
+                {data.signals.funding.investors.length > 0 && (
+                  <div className="text-xs mt-2" style={{ color: 'var(--vaaya-text-muted)' }}>
+                    {data.signals.funding.investors.slice(0, 2).join(', ')}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Hiring */}
+            {data.signals.hiring && (
+              <div className="bento-box rounded-lg p-4 shadow-sm">
+                <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  Hiring
+                </div>
+                <div className="text-xl font-bold" style={{ color: 'var(--vaaya-text)' }}>
+                  {data.signals.hiring.total_open_roles} roles
+                </div>
+                <div className={`text-sm ${
+                  data.signals.hiring.velocity === 'accelerating' ? 'text-green-600' :
+                  data.signals.hiring.velocity === 'slowing' ? 'text-red-600' : ''
+                }`} style={data.signals.hiring.velocity === 'stable' ? { color: 'var(--vaaya-text-muted)' } : {}}>
+                  {data.signals.hiring.velocity}
+                </div>
+              </div>
+            )}
+
+            {/* Web Footprint */}
+            {data.signals.web_footprint && (
+              <div className="bento-box rounded-lg p-4 shadow-sm">
+                <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  Web Traffic
+                </div>
+                <div className="text-xl font-bold" style={{ color: 'var(--vaaya-text)' }}>
+                  {data.signals.web_footprint.traffic_estimate}
+                </div>
+                <div className={`text-sm ${
+                  data.signals.web_footprint.trend === 'up' ? 'text-green-600' :
+                  data.signals.web_footprint.trend === 'down' ? 'text-red-600' : ''
+                }`}>
+                  {data.signals.web_footprint.trend === 'up' ? '↑ Growing' :
+                   data.signals.web_footprint.trend === 'down' ? '↓ Declining' : '→ Stable'}
+                </div>
+              </div>
+            )}
+
+            {/* Reliability */}
+            {data.signals.reliability && (
+              <div className="bento-box rounded-lg p-4 shadow-sm">
+                <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  Reliability
+                </div>
+                <div className="text-xl font-bold" style={{ color: 'var(--vaaya-text)' }}>
+                  {data.signals.reliability.incidents_30d} incidents
+                </div>
+                {data.signals.reliability.uptime_percent && (
+                  <div className="text-sm text-green-600">
+                    {data.signals.reliability.uptime_percent}% uptime
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </section>
       )}
     </div>

@@ -1,11 +1,11 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/db';
-import { executeSummaryStrategies } from '@/lib/strategies/summary';
+import { executeDashboardStrategies } from '@/lib/strategies/dashboard';
+import { executeProductStrategies } from '@/lib/strategies/product';
+import { executeBusinessStrategies } from '@/lib/strategies/business';
 import {
   TabId,
-  getEmptyProductData,
-  getEmptyBusinessData,
-  getEmptyPeopleData,
+  getEmptyPersonData,
 } from '@/lib/types';
 
 export const maxDuration = 60;
@@ -31,18 +31,17 @@ export async function POST(
     let result: { data: unknown; sources: string[] };
 
     switch (tab) {
-      case 'summary':
-        result = await executeSummaryStrategies(domain, companyName);
+      case 'dashboard':
+        result = await executeDashboardStrategies(domain, companyName);
         await supabase.from('companies').update({
-          summary_data: result.data,
-          summary_updated_at: new Date().toISOString(),
-          summary_sources: result.sources,
+          dashboard_data: result.data,
+          dashboard_updated_at: new Date().toISOString(),
+          dashboard_sources: result.sources,
         }).eq('domain', domain);
         break;
 
       case 'product':
-        // TODO: Implement product strategies
-        result = { data: getEmptyProductData(), sources: [] };
+        result = await executeProductStrategies(domain, companyName);
         await supabase.from('companies').update({
           product_data: result.data,
           product_updated_at: new Date().toISOString(),
@@ -51,8 +50,7 @@ export async function POST(
         break;
 
       case 'business':
-        // TODO: Implement business strategies
-        result = { data: getEmptyBusinessData(), sources: [] };
+        result = await executeBusinessStrategies(domain, companyName);
         await supabase.from('companies').update({
           business_data: result.data,
           business_updated_at: new Date().toISOString(),
@@ -60,13 +58,13 @@ export async function POST(
         }).eq('domain', domain);
         break;
 
-      case 'people':
-        // TODO: Implement people strategies
-        result = { data: getEmptyPeopleData(), sources: [] };
+      case 'person':
+        // TODO: Implement person strategies
+        result = { data: getEmptyPersonData(), sources: [] };
         await supabase.from('companies').update({
-          people_data: result.data,
-          people_updated_at: new Date().toISOString(),
-          people_sources: result.sources,
+          person_data: result.data,
+          person_updated_at: new Date().toISOString(),
+          person_sources: result.sources,
         }).eq('domain', domain);
         break;
 

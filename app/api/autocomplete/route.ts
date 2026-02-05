@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/db';
 
 // Domains to exclude from results (platforms, directories, research sites - not company websites)
 const EXCLUDED_DOMAINS = [
@@ -89,7 +90,36 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Primary: Use Clearbit autocomplete (free, designed for company lookup)
+    const results: Array<{ name: string; domain: string; logo: string }> = [];
+    const seenDomains = new Set<string>();
+
+    // First: Check database for previously searched companies
+    const supabase = createClient();
+    const { data: savedCompanies } = await supabase
+      .from('companies')
+      .select('name, domain, logo_url')
+      .or(`domain.ilike.%${query}%,name.ilike.%${query}%`)
+      .limit(5);
+
+    if (savedCompanies && savedCompanies.length > 0) {
+      for (const company of savedCompanies) {
+        if (!seenDomains.has(company.domain)) {
+          seenDomains.add(company.domain);
+          results.push({
+            name: company.name,
+            domain: company.domain,
+            logo: company.logo_url || `https://logo.clearbit.com/${company.domain}`,
+          });
+        }
+      }
+    }
+
+    // If we have enough results from database, return early
+    if (results.length >= 8) {
+      return NextResponse.json(results.slice(0, 8));
+    }
+
+    // Secondary: Use Clearbit autocomplete (free, designed for company lookup)
     const clearbitResponse = await fetch(
       `https://autocomplete.clearbit.com/v1/companies/suggest?query=${encodeURIComponent(query)}`,
       { headers: { 'Accept': 'application/json' } }
@@ -99,13 +129,22 @@ export async function GET(request: NextRequest) {
       const data = await clearbitResponse.json();
       if (data && data.length > 0) {
         // Clearbit returns: { name, domain, logo }
-        return NextResponse.json(data.slice(0, 8));
+        // Add Clearbit results that we haven't seen yet
+        for (const item of data) {
+          if (!seenDomains.has(item.domain) && results.length < 8) {
+            seenDomains.add(item.domain);
+            results.push(item);
+          }
+        }
+        if (results.length > 0) {
+          return NextResponse.json(results.slice(0, 8));
+        }
       }
     }
 
     // Fallback: Use Exa with strict filtering
     const exaKey = process.env.EXA_API_KEY;
-    if (exaKey) {
+    if (exaKey && results.length < 8) {
       const response = await fetch('https://api.exa.ai/search', {
         method: 'POST',
         headers: {
@@ -124,8 +163,6 @@ export async function GET(request: NextRequest) {
 
       if (response.ok) {
         const data = await response.json();
-        const results: Array<{ name: string; domain: string; logo: string }> = [];
-        const seenDomains = new Set<string>();
 
         for (const r of data.results || []) {
           let domain = '';
@@ -169,12 +206,10 @@ export async function GET(request: NextRequest) {
 
           if (results.length >= 8) break;
         }
-
-        return NextResponse.json(results);
       }
     }
 
-    return NextResponse.json([]);
+    return NextResponse.json(results);
   } catch (error) {
     console.error('Autocomplete error:', error);
     return NextResponse.json([]);

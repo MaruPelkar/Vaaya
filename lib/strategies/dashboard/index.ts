@@ -1,91 +1,99 @@
-import { BusinessData, getEmptyBusinessData } from '@/lib/types';
+import { DashboardData, getEmptyDashboardData } from '@/lib/types';
 import { scrapeUrl, searchWeb, buildCommonUrls, ScrapeResult, SearchResult } from '@/lib/firecrawl';
 import { structureContent } from '@/lib/openai';
-import { BUSINESS_JSON_SCHEMA, BUSINESS_SYSTEM_PROMPT } from './schemas';
+import { DASHBOARD_JSON_SCHEMA, DASHBOARD_SYSTEM_PROMPT } from './schemas';
 
-interface BusinessStrategyResult {
-  data: BusinessData;
+interface DashboardStrategyResult {
+  data: DashboardData;
   sources: string[];
 }
 
 /**
- * Execute Business tab strategies - focuses on GTM, pricing, competition, signals
+ * Execute all Dashboard tab strategies in parallel and merge results
  */
-export async function executeBusinessStrategies(
+export async function executeDashboardStrategies(
   domain: string,
   companyName: string
-): Promise<BusinessStrategyResult> {
+): Promise<DashboardStrategyResult> {
   const sources: string[] = [];
   const startTime = Date.now();
 
-  console.log(`[Business] Starting data collection for ${companyName} (${domain})`);
+  console.log(`[Dashboard] Starting data collection for ${companyName} (${domain})`);
 
   const urls = buildCommonUrls(domain);
 
-  // Run scrapers in parallel - focus on business-related pages
+  // Run all scrapers and searches in parallel
   const [
     homepageResult,
     pricingResult,
+    featuresResult,
+    integrationsResult,
     aboutResult,
     careersResult,
     competitorSearchResult,
-    fundingSearchResult,
     reviewSearchResult,
+    newsSearchResult,
   ] = await Promise.allSettled([
+    // Scrape key pages
     scrapeUrl(urls.homepage),
     scrapeUrl(urls.pricing),
+    scrapeUrl(urls.features),
+    scrapeUrl(urls.integrations),
     scrapeUrl(urls.about),
     scrapeUrl(urls.careers),
-    searchWeb(`${companyName} competitors vs alternatives comparison`, { limit: 5 }),
-    searchWeb(`${companyName} funding investors valuation`, { limit: 5 }),
-    searchWeb(`${companyName} reviews G2 pricing customer feedback`, { limit: 5 }),
+    // Web searches for additional context
+    searchWeb(`${companyName} competitors vs alternatives`, { limit: 5 }),
+    searchWeb(`${companyName} reviews G2 Capterra customer feedback`, { limit: 5 }),
+    searchWeb(`${companyName} news funding 2024 2025`, { limit: 5 }),
   ]);
 
-  // Aggregate content
-  const aggregatedContent = buildBusinessContent(
+  // Aggregate scraped content
+  const aggregatedContent = buildAggregatedContent(
     companyName,
     domain,
     {
       homepage: extractResult(homepageResult),
       pricing: extractResult(pricingResult),
+      features: extractResult(featuresResult),
+      integrations: extractResult(integrationsResult),
       about: extractResult(aboutResult),
       careers: extractResult(careersResult),
     },
     {
       competitors: extractSearchResult(competitorSearchResult),
-      funding: extractSearchResult(fundingSearchResult),
       reviews: extractSearchResult(reviewSearchResult),
+      news: extractSearchResult(newsSearchResult),
     },
     sources
   );
 
-  console.log(`[Business] Scraped ${sources.length} sources, structuring with AI...`);
+  console.log(`[Dashboard] Scraped ${sources.length} sources, structuring with AI...`);
 
-  // If no sources, return empty data
+  // If no sources were successfully scraped, return empty data to avoid hallucination
   if (sources.length === 0) {
-    console.log(`[Business] No sources available - returning empty data`);
+    console.log(`[Dashboard] No sources available - returning empty data to prevent hallucination`);
     const elapsed = Date.now() - startTime;
-    console.log(`[Business] Completed in ${elapsed}ms`);
-    return { data: getEmptyBusinessData(), sources };
+    console.log(`[Dashboard] Completed in ${elapsed}ms`);
+    return { data: getEmptyDashboardData(), sources };
   }
 
-  // Use OpenAI to structure into BusinessData
-  const businessData = await structureContent<BusinessData>(
+  // Use OpenAI to structure into DashboardData
+  const dashboardData = await structureContent<DashboardData>(
     aggregatedContent,
-    BUSINESS_SYSTEM_PROMPT,
-    BUSINESS_JSON_SCHEMA,
+    DASHBOARD_SYSTEM_PROMPT,
+    DASHBOARD_JSON_SCHEMA,
     { maxTokens: 8000 }
   );
 
   const elapsed = Date.now() - startTime;
-  console.log(`[Business] Completed in ${elapsed}ms`);
+  console.log(`[Dashboard] Completed in ${elapsed}ms`);
 
-  if (businessData) {
-    businessData.generated_at = new Date().toISOString();
-    return { data: businessData, sources };
+  if (dashboardData) {
+    dashboardData.generated_at = new Date().toISOString();
+    return { data: dashboardData, sources };
   }
 
-  return { data: getEmptyBusinessData(), sources };
+  return { data: getEmptyDashboardData(), sources };
 }
 
 function extractResult(
@@ -106,30 +114,32 @@ function extractSearchResult(
   return null;
 }
 
-function buildBusinessContent(
+function buildAggregatedContent(
   companyName: string,
   domain: string,
   scraped: {
     homepage: ScrapeResult | null;
     pricing: ScrapeResult | null;
+    features: ScrapeResult | null;
+    integrations: ScrapeResult | null;
     about: ScrapeResult | null;
     careers: ScrapeResult | null;
   },
   searched: {
     competitors: SearchResult | null;
-    funding: SearchResult | null;
     reviews: SearchResult | null;
+    news: SearchResult | null;
   },
   sources: string[]
 ): string {
   const sections: string[] = [];
 
-  sections.push(`# Business Intelligence: ${companyName}`);
+  sections.push(`# Company Analysis: ${companyName}`);
   sections.push(`Domain: ${domain}`);
   sections.push(`Analysis Date: ${new Date().toISOString().split('T')[0]}`);
   sections.push('');
 
-  // Homepage for GTM context
+  // Homepage content
   if (scraped.homepage?.markdown) {
     sources.push('homepage');
     sections.push('## Homepage Content');
@@ -140,19 +150,35 @@ function buildBusinessContent(
       sections.push(`Description: ${scraped.homepage.metadata.description}`);
     }
     sections.push('');
-    sections.push(truncateContent(scraped.homepage.markdown, 3000));
+    sections.push(truncateContent(scraped.homepage.markdown, 6000));
     sections.push('');
   }
 
-  // Pricing page - primary source for pricing analysis
+  // Pricing page content
   if (scraped.pricing?.markdown) {
     sources.push('pricing');
     sections.push('## Pricing Page Content');
-    sections.push(truncateContent(scraped.pricing.markdown, 8000));
+    sections.push(truncateContent(scraped.pricing.markdown, 5000));
     sections.push('');
   }
 
-  // About page - for company context
+  // Features page content
+  if (scraped.features?.markdown) {
+    sources.push('features');
+    sections.push('## Features Page Content');
+    sections.push(truncateContent(scraped.features.markdown, 4000));
+    sections.push('');
+  }
+
+  // Integrations page content
+  if (scraped.integrations?.markdown) {
+    sources.push('integrations');
+    sections.push('## Integrations Page Content');
+    sections.push(truncateContent(scraped.integrations.markdown, 3000));
+    sections.push('');
+  }
+
+  // About page content
   if (scraped.about?.markdown) {
     sources.push('about');
     sections.push('## About Page Content');
@@ -160,11 +186,11 @@ function buildBusinessContent(
     sections.push('');
   }
 
-  // Careers page - for hiring signals
+  // Careers page content (for hiring signals)
   if (scraped.careers?.markdown) {
     sources.push('careers');
     sections.push('## Careers Page Content');
-    sections.push(truncateContent(scraped.careers.markdown, 3000));
+    sections.push(truncateContent(scraped.careers.markdown, 2000));
     sections.push('');
   }
 
@@ -173,20 +199,6 @@ function buildBusinessContent(
     sources.push('competitor_search');
     sections.push('## Competitor Research');
     for (const item of searched.competitors.data.slice(0, 5)) {
-      sections.push(`### ${item.title}`);
-      sections.push(item.description);
-      if (item.markdown) {
-        sections.push(truncateContent(item.markdown, 1500));
-      }
-      sections.push('');
-    }
-  }
-
-  // Funding search results
-  if (searched.funding?.data && searched.funding.data.length > 0) {
-    sources.push('funding_search');
-    sections.push('## Funding & Investment Information');
-    for (const item of searched.funding.data.slice(0, 5)) {
       sections.push(`### ${item.title}`);
       sections.push(item.description);
       if (item.markdown) {
@@ -206,6 +218,17 @@ function buildBusinessContent(
       if (item.markdown) {
         sections.push(truncateContent(item.markdown, 1000));
       }
+      sections.push('');
+    }
+  }
+
+  // News search results
+  if (searched.news?.data && searched.news.data.length > 0) {
+    sources.push('news_search');
+    sections.push('## Recent News & Updates');
+    for (const item of searched.news.data.slice(0, 5)) {
+      sections.push(`### ${item.title}`);
+      sections.push(item.description);
       sections.push('');
     }
   }

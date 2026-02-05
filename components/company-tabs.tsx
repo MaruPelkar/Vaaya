@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { CompanyResponse, TabId } from '@/lib/types';
-import { SummaryTab } from './tabs/summary-tab';
+import { DashboardTab } from './tabs/dashboard-tab';
 import { ProductTab } from './tabs/product-tab';
 import { BusinessTab } from './tabs/business-tab';
 import { RefreshButton } from './refresh-button';
@@ -14,25 +14,25 @@ interface CompanyTabsProps {
 }
 
 const TAB_CONFIG = [
-  { id: 'summary' as const, label: 'Summary' },
+  { id: 'dashboard' as const, label: 'Dashboard' },
   { id: 'product' as const, label: 'Product' },
   { id: 'business' as const, label: 'Business' },
-  { id: 'people' as const, label: 'People' },
+  { id: 'person' as const, label: 'Person' },
 ];
 
 export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('summary');
+  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
 
   const getTabData = () => {
     switch (activeTab) {
-      case 'summary':
-        return data.summary;
+      case 'dashboard':
+        return data.dashboard;
       case 'product':
         return data.product;
       case 'business':
         return data.business;
-      case 'people':
-        return data.people;
+      case 'person':
+        return data.person;
     }
   };
 
@@ -123,10 +123,10 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
             </div>
           ) : (
             <>
-              {activeTab === 'summary' && <SummaryTab data={data.summary.data} />}
+              {activeTab === 'dashboard' && <DashboardTab data={data.dashboard.data} />}
               {activeTab === 'product' && <ProductTab data={data.product.data} />}
               {activeTab === 'business' && <BusinessTab data={data.business.data} />}
-              {activeTab === 'people' && <PeopleTabPlaceholder />}
+              {activeTab === 'person' && <PersonTabPlaceholder />}
             </>
           )}
         </div>
@@ -135,12 +135,12 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
   );
 }
 
-// Placeholder for People tab (not yet implemented)
-function PeopleTabPlaceholder() {
+// Placeholder for Person tab (not yet implemented)
+function PersonTabPlaceholder() {
   return (
     <div className="text-center py-12" style={{ color: 'var(--vaaya-text-muted)' }}>
-      <div className="text-4xl mb-4">🚧</div>
-      <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--vaaya-text)' }}>People Tab Coming Soon</h3>
+      <div className="text-4xl mb-4">👤</div>
+      <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--vaaya-text)' }}>Person Tab Coming Soon</h3>
       <p>Discovered users and buyers will appear here.</p>
     </div>
   );
