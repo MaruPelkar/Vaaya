@@ -1,14 +1,13 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/db';
-import { executeSummaryStrategies } from '@/lib/strategies/summary';
+import { executeDashboardStrategies } from '@/lib/strategies/dashboard';
 import { executeProductStrategies } from '@/lib/strategies/product';
 import { executeBusinessStrategies } from '@/lib/strategies/business';
 import {
   TabId,
-  getEmptySummaryData,
   getEmptyProductData,
   getEmptyBusinessData,
-  getEmptyPeopleData,
+  getEmptyPersonData,
 } from '@/lib/types';
 
 export const maxDuration = 60; // Vercel function timeout
@@ -27,7 +26,7 @@ export async function GET(
     .eq('domain', domain)
     .single();
 
-  if (existing && existing.summary_updated_at) {
+  if (existing && existing.dashboard_updated_at) {
     // Return cached data
     return Response.json({
       company: {
@@ -35,10 +34,10 @@ export async function GET(
         name: existing.name,
         logo_url: existing.logo_url,
       },
-      summary: {
-        data: existing.summary_data,
-        updated_at: existing.summary_updated_at,
-        sources: existing.summary_sources || [],
+      dashboard: {
+        data: existing.dashboard_data,
+        updated_at: existing.dashboard_updated_at,
+        sources: existing.dashboard_sources || [],
       },
       product: {
         data: existing.product_data || getEmptyProductData(),
@@ -50,10 +49,10 @@ export async function GET(
         updated_at: existing.business_updated_at,
         sources: existing.business_sources || [],
       },
-      people: {
-        data: existing.people_data || getEmptyPeopleData(),
-        updated_at: existing.people_updated_at,
-        sources: existing.people_sources || [],
+      person: {
+        data: existing.person_data || getEmptyPersonData(),
+        updated_at: existing.person_updated_at,
+        sources: existing.person_sources || [],
       },
     });
   }
@@ -86,32 +85,31 @@ export async function GET(
       });
 
       // Execute tabs in parallel
-      // Summary, Product, and Business tabs are implemented. People tab returns empty data.
       await Promise.allSettled([
-        // Summary Tab
+        // Dashboard Tab
         (async () => {
-          await sendEvent({ type: 'tab_started', tab: 'summary' as TabId });
+          await sendEvent({ type: 'tab_started', tab: 'dashboard' as TabId });
           try {
-            const result = await executeSummaryStrategies(domain, companyName);
+            const result = await executeDashboardStrategies(domain, companyName);
 
             await supabase.from('companies').update({
-              summary_data: result.data,
-              summary_updated_at: new Date().toISOString(),
-              summary_sources: result.sources,
+              dashboard_data: result.data,
+              dashboard_updated_at: new Date().toISOString(),
+              dashboard_sources: result.sources,
             }).eq('domain', domain);
 
             await sendEvent({
               type: 'tab_complete',
-              tab: 'summary' as TabId,
+              tab: 'dashboard' as TabId,
               data: result.data,
               sources: result.sources,
             });
           } catch (error) {
-            console.error('Summary tab error:', error);
+            console.error('Dashboard tab error:', error);
             await sendEvent({
               type: 'tab_error',
-              tab: 'summary' as TabId,
-              error: 'Failed to fetch company summary',
+              tab: 'dashboard' as TabId,
+              error: 'Failed to fetch dashboard data',
             });
           }
         })(),
@@ -172,29 +170,29 @@ export async function GET(
           }
         })(),
 
-        // People Tab (placeholder - returns empty data for now)
+        // Person Tab (placeholder - returns empty data for now)
         (async () => {
-          await sendEvent({ type: 'tab_started', tab: 'people' as TabId });
+          await sendEvent({ type: 'tab_started', tab: 'person' as TabId });
           try {
-            const emptyData = getEmptyPeopleData();
+            const emptyData = getEmptyPersonData();
             await supabase.from('companies').update({
-              people_data: emptyData,
-              people_updated_at: new Date().toISOString(),
-              people_sources: [],
+              person_data: emptyData,
+              person_updated_at: new Date().toISOString(),
+              person_sources: [],
             }).eq('domain', domain);
 
             await sendEvent({
               type: 'tab_complete',
-              tab: 'people' as TabId,
+              tab: 'person' as TabId,
               data: emptyData,
               sources: [],
             });
           } catch (error) {
-            console.error('People tab error:', error);
+            console.error('Person tab error:', error);
             await sendEvent({
               type: 'tab_error',
-              tab: 'people' as TabId,
-              error: 'Failed to fetch people data',
+              tab: 'person' as TabId,
+              error: 'Failed to fetch person data',
             });
           }
         })(),

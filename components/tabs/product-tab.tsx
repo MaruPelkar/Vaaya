@@ -9,9 +9,9 @@ interface ProductTabProps {
 
 const WORKFLOW_LABELS: Record<string, string> = {
   onboarding: 'Onboarding',
-  core_action: 'Core Actions',
+  core_workflow: 'Core Workflow',
   collaboration: 'Collaboration',
-  reporting: 'Reporting & Analytics',
+  analytics: 'Analytics',
   admin: 'Admin & Settings',
 };
 
@@ -34,15 +34,26 @@ export function ProductTab({ data }: ProductTabProps) {
 
   const allFeatures = [
     ...data.feature_map.onboarding,
-    ...data.feature_map.core_action,
+    ...data.feature_map.core_workflow,
     ...data.feature_map.collaboration,
-    ...data.feature_map.reporting,
+    ...data.feature_map.analytics,
     ...data.feature_map.admin,
   ];
 
   const hasFeatures = allFeatures.length > 0;
-  const hasIntegrations = data.integrations.top_integrations.length > 0;
+  const hasIntegrations = data.integrations.items.length > 0;
   const hasPersonas = data.personas.length > 0;
+
+  // Empty state when no data
+  if (!hasFeatures && !hasIntegrations && !hasPersonas) {
+    return (
+      <div className="text-center py-12" style={{ color: 'var(--vaaya-text-muted)' }}>
+        <div className="text-4xl mb-4">📦</div>
+        <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--vaaya-text)' }}>Product Tab Coming Soon</h3>
+        <p>Detailed feature map and integrations will appear here.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
@@ -88,12 +99,14 @@ export function ProductTab({ data }: ProductTabProps) {
               <div key={i} className="bento-box rounded-lg p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="font-bold" style={{ color: 'var(--vaaya-text)' }}>
-                    {persona.title}
+                    {persona.name}
                   </div>
-                  <Chip variant="small">{persona.department}</Chip>
-                  <span className="text-xs capitalize" style={{ color: 'var(--vaaya-text-muted)' }}>
-                    {persona.seniority.replace('_', ' ')}
-                  </span>
+                  <Chip variant="small">{persona.type}</Chip>
+                  {persona.role && (
+                    <span className="text-xs" style={{ color: 'var(--vaaya-text-muted)' }}>
+                      {persona.role}
+                    </span>
+                  )}
                 </div>
 
                 {persona.jobs_to_be_done.length > 0 && (
@@ -112,15 +125,15 @@ export function ProductTab({ data }: ProductTabProps) {
                   </div>
                 )}
 
-                {persona.pain_points_solved.length > 0 && (
+                {persona.pains.length > 0 && (
                   <div>
                     <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                      Pain Points Solved
+                      Pain Points
                     </div>
                     <ul className="space-y-1">
-                      {persona.pain_points_solved.slice(0, 3).map((pain, j) => (
+                      {persona.pains.slice(0, 3).map((pain, j) => (
                         <li key={j} className="text-sm flex items-start gap-2" style={{ color: 'var(--vaaya-text)' }}>
-                          <span className="text-green-600">✓</span>
+                          <span className="text-red-600">•</span>
                           {pain}
                         </li>
                       ))}
@@ -147,95 +160,31 @@ export function ProductTab({ data }: ProductTabProps) {
         </div>
 
         {hasIntegrations ? (
-          <>
-            {/* Categories */}
-            {data.integrations.categories.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                {data.integrations.categories.map((cat, i) => (
-                  <Chip key={i} variant="category">
-                    {cat.name} ({cat.count})
-                  </Chip>
-                ))}
-              </div>
-            )}
-
-            {/* Top Integrations Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {data.integrations.top_integrations.slice(0, 12).map((integration, i) => (
-                <div key={i} className="bento-box rounded-lg p-4 shadow-sm">
-                  <div className="font-bold text-sm mb-1" style={{ color: 'var(--vaaya-text)' }}>
-                    {integration.name}
-                  </div>
-                  <div className="text-xs mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                    {integration.category}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      integration.depth === 'native' ? 'bg-green-100 text-green-700' :
-                      integration.depth === 'api' ? 'bg-blue-100 text-blue-700' :
-                      integration.depth === 'zapier_only' ? 'bg-orange-100 text-orange-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
-                      {integration.depth.replace('_', ' ')}
-                    </span>
-                  </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {data.integrations.items.slice(0, 12).map((integration, i) => (
+              <div key={i} className="bento-box rounded-lg p-4 shadow-sm">
+                <div className="font-bold text-sm mb-1" style={{ color: 'var(--vaaya-text)' }}>
+                  {integration.name}
                 </div>
-              ))}
-            </div>
-          </>
+                <div className="text-xs mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  {integration.category}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-0.5 rounded ${
+                    integration.depth === 'deep' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                  }`}>
+                    {integration.depth}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="bento-box rounded-lg p-8 text-center" style={{ color: 'var(--vaaya-text-muted)' }}>
             No integrations identified yet
           </div>
         )}
       </section>
-
-      {/* Available Filters (for reference) */}
-      {(data.available_personas.length > 0 || data.available_feature_areas.length > 0) && (
-        <section className="bento-box rounded-lg p-6 shadow-sm">
-          <h4 className="text-sm font-bold uppercase tracking-wide mb-4" style={{ color: 'var(--vaaya-text-muted)' }}>
-            Feature Metadata
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {data.available_personas.length > 0 && (
-              <div>
-                <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                  Personas
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {data.available_personas.map((p, i) => (
-                    <Chip key={i} variant="small">{p}</Chip>
-                  ))}
-                </div>
-              </div>
-            )}
-            {data.available_plan_gates.length > 0 && (
-              <div>
-                <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                  Plan Gates
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {data.available_plan_gates.map((p, i) => (
-                    <Chip key={i} variant="small">{p}</Chip>
-                  ))}
-                </div>
-              </div>
-            )}
-            {data.available_feature_areas.length > 0 && (
-              <div>
-                <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-                  Feature Areas
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {data.available_feature_areas.map((a, i) => (
-                    <Chip key={i} variant="small">{a}</Chip>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
@@ -248,14 +197,14 @@ function FeatureCard({ feature }: { feature: Feature }) {
           {feature.name}
         </div>
         <div className="flex items-center gap-1">
-          {feature.is_new && (
-            <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-medium">
-              New
+          {feature.status === 'beta' && (
+            <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-700 font-medium">
+              Beta
             </span>
           )}
-          {feature.is_updated && (
-            <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-medium">
-              Updated
+          {feature.status === 'deprecated' && (
+            <span className="text-xs px-2 py-0.5 rounded bg-red-100 text-red-700 font-medium">
+              Deprecated
             </span>
           )}
         </div>

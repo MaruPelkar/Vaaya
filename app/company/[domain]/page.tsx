@@ -7,14 +7,14 @@ import {
   CompanyResponse,
   StreamEvent,
   TabId,
-  SummaryData,
+  DashboardData,
   ProductData,
   BusinessData,
-  PeopleData,
-  getEmptySummaryData,
+  PersonData,
+  getEmptyDashboardData,
   getEmptyProductData,
   getEmptyBusinessData,
-  getEmptyPeopleData,
+  getEmptyPersonData,
 } from '@/lib/types';
 
 export default function CompanyPage({ params }: { params: Promise<{ domain: string }> }) {
@@ -23,10 +23,10 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
   const [data, setData] = useState<CompanyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [tabsLoading, setTabsLoading] = useState<Record<TabId, boolean>>({
-    summary: false,
+    dashboard: false,
     product: false,
     business: false,
-    people: false,
+    person: false,
   });
 
   useEffect(() => {
@@ -48,13 +48,13 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
         // Initialize with loading states
         setData({
           company: { domain: domain, name: domain, logo_url: `https://logo.clearbit.com/${domain}` },
-          summary: { data: getEmptySummaryData(), updated_at: null, sources: [], loading: true },
+          dashboard: { data: getEmptyDashboardData(), updated_at: null, sources: [], loading: true },
           product: { data: getEmptyProductData(), updated_at: null, sources: [], loading: true },
           business: { data: getEmptyBusinessData(), updated_at: null, sources: [], loading: true },
-          people: { data: getEmptyPeopleData(), updated_at: null, sources: [], loading: true },
+          person: { data: getEmptyPersonData(), updated_at: null, sources: [], loading: true },
         });
         setLoading(false);
-        setTabsLoading({ summary: true, product: true, business: true, people: true });
+        setTabsLoading({ dashboard: true, product: true, business: true, person: true });
 
         let buffer = '';
 
@@ -87,7 +87,7 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
                     return {
                       ...prev,
                       [tabKey]: {
-                        data: event.data as SummaryData | ProductData | BusinessData | PeopleData,
+                        data: event.data as DashboardData | ProductData | BusinessData | PersonData,
                         updated_at: new Date().toISOString(),
                         sources: event.sources,
                         loading: false,
