@@ -14,10 +14,10 @@ interface CompanyTabsProps {
 }
 
 const TAB_CONFIG = [
-  { id: 'summary' as const, label: 'Summary', subtitle: 'Should I dig deeper?' },
-  { id: 'product' as const, label: 'Product', subtitle: 'How it works' },
-  { id: 'business' as const, label: 'Business', subtitle: 'Can they win?' },
-  { id: 'people' as const, label: 'People', subtitle: 'Who uses it?' },
+  { id: 'summary' as const, label: 'Summary' },
+  { id: 'product' as const, label: 'Product' },
+  { id: 'business' as const, label: 'Business' },
+  { id: 'people' as const, label: 'People' },
 ];
 
 export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) {
@@ -63,27 +63,19 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
               }
             }}
           >
-            <div className="text-left">
-              <div
-                className="tab-label text-base font-semibold transition-colors"
-                style={{
-                  color: activeTab === tab.id ? 'var(--vaaya-brand)' : 'var(--vaaya-text-muted)',
-                }}
-              >
-                {tab.label}
-                {tabsLoading[tab.id] && (
-                  <span
-                    className="ml-2 inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-                    style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
-                  />
-                )}
-              </div>
-              <div
-                className="text-xs mt-0.5"
-                style={{ color: 'var(--vaaya-text-muted)' }}
-              >
-                {tab.subtitle}
-              </div>
+            <div
+              className="tab-label text-base font-semibold transition-colors"
+              style={{
+                color: activeTab === tab.id ? 'var(--vaaya-brand)' : 'var(--vaaya-text-muted)',
+              }}
+            >
+              {tab.label}
+              {tabsLoading[tab.id] && (
+                <span
+                  className="ml-2 inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                  style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+                />
+              )}
             </div>
           </button>
         ))}
