@@ -26,27 +26,35 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex gradient-primary relative overflow-hidden">
-      {/* Background decoration */}
+    <main className="min-h-screen flex relative overflow-hidden">
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        src="/videos/background.mov"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 0, transform: 'scale(1.1)' }}
+      />
+      {/* Dark overlay for readability */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `
-            radial-gradient(circle at 20% 50%, rgba(77, 168, 168, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(61, 148, 148, 0.15) 0%, transparent 50%)
-          `,
+          background: 'rgba(26, 107, 107, 0.6)',
+          zIndex: 1,
         }}
       />
 
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 relative z-10">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 relative" style={{ zIndex: 2 }}>
         <div className="max-w-lg">
           <h1 className="headline-display text-white mb-6">
             Company Intelligence<br />
             <span style={{ fontStyle: 'italic' }}>Reimagined.</span>
           </h1>
           <p className="text-lg leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-            Research any B2B company in seconds. Get deep insights on product, pricing, positioning, and competitive landscape.
+            Research any B2B company in seconds. Get deep insights on product, pricing, positioning, and competitive landscape. Talk to users who matter.
           </p>
 
           {/* Feature highlights */}
@@ -73,7 +81,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative" style={{ zIndex: 2 }}>
         <div
           className="w-full max-w-md p-10 rounded-2xl"
           style={{
@@ -186,12 +194,6 @@ export default function LoginPage() {
               </svg>
               <span>SSL Encrypted</span>
             </div>
-            <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--gray-500)' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
-              <span>SOC 2 Compliant</span>
-            </div>
           </div>
 
           {/* Terms */}
@@ -209,7 +211,7 @@ export default function LoginPage() {
       </div>
 
       {/* Mobile branding (shown on small screens) */}
-      <div className="lg:hidden absolute top-8 left-0 right-0 text-center">
+      <div className="lg:hidden absolute top-8 left-0 right-0 text-center" style={{ zIndex: 2 }}>
         <h2 className="font-display text-2xl text-white">Company Intelligence</h2>
       </div>
     </main>

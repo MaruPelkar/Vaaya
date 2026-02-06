@@ -12,20 +12,36 @@ export default function HomePage() {
   };
 
   return (
-    <main className="hero gradient-primary relative">
+    <main className="hero relative overflow-hidden">
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        src="/videos/background.mov"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 0, transform: 'scale(1.1)' }}
+      />
+      {/* Dark overlay for readability */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'rgba(26, 107, 107, 0.6)',
+          zIndex: 1,
+        }}
+      />
       {/* Header with user menu */}
       <header className="absolute top-0 right-0 p-6 z-10">
         <UserMenu variant="dark" />
       </header>
 
-      <div className="hero-content animate-fade-in-up">
+      <div className="hero-content animate-fade-in-up" style={{ zIndex: 2, position: 'relative' }}>
         <span className="eyebrow text-white" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-          COMPANY INTELLIGENCE
+          RESEARCH ON STEROIDS
         </span>
         <h1 className="headline-display hero-title">
-          Stop Guessing.<br />
-          Start Knowing Your<br />
-          Competitors.
+          Know Your Competitors.
         </h1>
         <p className="hero-subtitle">
           Research any B2B company in seconds. Get deep insights on product, pricing, positioning, and more.
