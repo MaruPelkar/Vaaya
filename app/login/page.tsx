@@ -83,18 +83,12 @@ export default function LoginPage() {
         >
           {/* Logo */}
           <div className="text-center mb-10">
-            <div
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6"
-              style={{
-                background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)',
-              }}
-            >
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-              </svg>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Vaaya"
+              className="w-20 h-20 mx-auto mb-6 rounded-2xl"
+              style={{ boxShadow: 'var(--shadow-lg)' }}
+            />
             <h1 className="font-display text-3xl font-medium mb-2" style={{ color: 'var(--gray-900)' }}>
               Welcome back
             </h1>
