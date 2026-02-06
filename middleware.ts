@@ -5,6 +5,11 @@ import { updateSession } from '@/lib/supabase/middleware';
 const publicRoutes = ['/login', '/auth/callback'];
 
 export async function middleware(request: NextRequest) {
+  // Skip auth in development mode for easier local testing
+  if (process.env.NODE_ENV === 'development') {
+    return NextResponse.next();
+  }
+
   const { supabaseResponse, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
 

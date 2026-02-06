@@ -1,24 +1,165 @@
 'use client';
 
+import { useState } from 'react';
 import { PersonData, DiscoveredPerson, CompanyUsing } from '@/lib/types';
 
 interface PersonTabProps {
   data: PersonData | null;
 }
 
-const CONFIDENCE_COLORS: Record<string, string> = {
-  high: 'bg-green-100 text-green-700',
-  medium: 'bg-yellow-100 text-yellow-700',
-  low: 'bg-gray-100 text-gray-700',
+type SubTabId = 'companies' | 'people';
+
+const SUB_TAB_CONFIG = [
+  {
+    id: 'companies' as const,
+    label: 'Customer Companies',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    )
+  },
+  {
+    id: 'people' as const,
+    label: 'People',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    )
+  },
+];
+
+// Table styles
+const tableStyles = {
+  container: {
+    backgroundColor: 'var(--white)',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    border: '1px solid var(--gray-200)',
+  },
+  wrapper: {
+    overflowX: 'auto' as const,
+    overflowY: 'auto' as const,
+    maxHeight: '500px',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse' as const,
+    fontSize: '0.8125rem',
+  },
+  th: {
+    padding: '0.75rem 1rem',
+    textAlign: 'left' as const,
+    fontWeight: 600,
+    fontSize: '0.6875rem',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+    color: 'var(--gray-600)',
+    borderBottom: '1px solid var(--gray-300)',
+    whiteSpace: 'nowrap' as const,
+    backgroundColor: 'var(--gray-100)',
+    position: 'sticky' as const,
+    top: 0,
+    zIndex: 10,
+  },
+  td: {
+    padding: '0.75rem 1rem',
+    borderBottom: '1px solid var(--gray-200)',
+    color: 'var(--gray-800)',
+    verticalAlign: 'middle' as const,
+  },
+  tdFirst: {
+    paddingLeft: '1.5rem',
+  },
+  tdLast: {
+    paddingRight: '1.5rem',
+  },
 };
 
-const PERSONA_TYPE_COLORS: Record<string, string> = {
-  user: 'bg-blue-100 text-blue-700',
-  buyer: 'bg-purple-100 text-purple-700',
-  evaluator: 'bg-orange-100 text-orange-700',
+const badgeStyles: Record<string, React.CSSProperties> = {
+  high: {
+    display: 'inline-block',
+    padding: '0.25rem 0.625rem',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+    whiteSpace: 'nowrap',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    color: '#059669',
+  },
+  medium: {
+    display: 'inline-block',
+    padding: '0.25rem 0.625rem',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+    whiteSpace: 'nowrap',
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    color: '#d97706',
+  },
+  low: {
+    display: 'inline-block',
+    padding: '0.25rem 0.625rem',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+    whiteSpace: 'nowrap',
+    backgroundColor: 'var(--gray-100)',
+    color: 'var(--gray-600)',
+  },
+  user: {
+    display: 'inline-block',
+    padding: '0.25rem 0.625rem',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+    whiteSpace: 'nowrap',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    color: '#2563eb',
+  },
+  buyer: {
+    display: 'inline-block',
+    padding: '0.25rem 0.625rem',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+    whiteSpace: 'nowrap',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    color: '#7c3aed',
+  },
+  evaluator: {
+    display: 'inline-block',
+    padding: '0.25rem 0.625rem',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+    whiteSpace: 'nowrap',
+    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+    color: '#ea580c',
+  },
 };
 
 export function PersonTab({ data }: PersonTabProps) {
+  const [activeSubTab, setActiveSubTab] = useState<SubTabId>('companies');
+
   if (!data) {
     return (
       <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
@@ -31,8 +172,9 @@ export function PersonTab({ data }: PersonTabProps) {
   const hasUsers = data.users.length > 0;
   const hasBuyers = data.buyers.length > 0;
   const hasPeople = hasUsers || hasBuyers;
+  const totalPeople = data.users.length + data.buyers.length;
 
-  // Empty state when no data
+  // Empty state when no data at all
   if (!hasCompanies && !hasPeople) {
     return (
       <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
@@ -44,186 +186,289 @@ export function PersonTab({ data }: PersonTabProps) {
   }
 
   return (
-    <div className="space-y-10">
-      {/* Customer Companies */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-2xl font-semibold" style={{ color: 'var(--gray-900)' }}>
-            Customer Companies
-          </h3>
-          {hasCompanies && (
-            <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
-              {data.companies_using.length} discovered
-            </span>
-          )}
-        </div>
-
-        {hasCompanies ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.companies_using.map((company, i) => (
-              <CompanyCard key={i} company={company} />
-            ))}
-          </div>
-        ) : (
-          <div className="dashboard-card rounded-lg p-8 text-center" style={{ color: 'var(--gray-500)' }}>
-            No customer companies discovered yet
-          </div>
-        )}
-      </section>
-
-      {/* Users - Daily product users */}
-      {hasUsers && (
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-display text-2xl font-semibold" style={{ color: 'var(--gray-900)' }}>
-              Users
-            </h3>
-            <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
-              {data.users.length} people
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.users.map((person, i) => (
-              <PersonCard key={i} person={person} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Buyers - Decision makers */}
-      {hasBuyers && (
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-display text-2xl font-semibold" style={{ color: 'var(--gray-900)' }}>
-              Buyers & Evaluators
-            </h3>
-            <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
-              {data.buyers.length} people
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.buyers.map((person, i) => (
-              <PersonCard key={i} person={person} />
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
-}
-
-function CompanyCard({ company }: { company: CompanyUsing }) {
-  return (
-    <div className="dashboard-card rounded-lg p-4 shadow-sm" style={{ border: '1px solid var(--gray-200)' }}>
-      <div className="flex items-start justify-between mb-2">
-        <div className="font-bold" style={{ color: 'var(--gray-900)' }}>
-          {company.name}
-        </div>
-        <span className={`text-xs px-2 py-0.5 rounded font-medium ${CONFIDENCE_COLORS[company.confidence]}`}>
-          {company.confidence}
-        </span>
-      </div>
-
-      <div className="space-y-1 text-sm" style={{ color: 'var(--gray-500)' }}>
-        {company.domain && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium uppercase">Domain:</span>
-            <a
-              href={`https://${company.domain}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-              style={{ color: 'var(--primary)' }}
-            >
-              {company.domain}
-            </a>
-          </div>
-        )}
-        {company.industry && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium uppercase">Industry:</span>
-            <span>{company.industry}</span>
-          </div>
-        )}
-        {company.size && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium uppercase">Size:</span>
-            <span>{company.size}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PersonCard({ person }: { person: DiscoveredPerson }) {
-  return (
-    <div className="dashboard-card rounded-lg p-4 shadow-sm" style={{ border: '1px solid var(--gray-200)' }}>
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <div className="font-bold" style={{ color: 'var(--gray-900)' }}>
-            {person.name}
-          </div>
-          {person.role && (
-            <div className="text-sm" style={{ color: 'var(--gray-500)' }}>
-              {person.role}
-            </div>
-          )}
-        </div>
-        <span className={`text-xs px-2 py-0.5 rounded font-medium ${PERSONA_TYPE_COLORS[person.type]}`}>
-          {person.type}
-        </span>
-      </div>
-
-      {person.company && (
-        <div className="text-sm mb-3" style={{ color: 'var(--gray-500)' }}>
-          at <span style={{ color: 'var(--gray-900)' }}>{person.company}</span>
-        </div>
-      )}
-
-      <div className="flex items-center justify-between">
-        {person.linkedin_url && (
-          <a
-            href={person.linkedin_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm flex items-center gap-1 hover:underline"
-            style={{ color: 'var(--primary)' }}
+    <div>
+      {/* Sub-Tab Navigation */}
+      <div
+        className="flex gap-2 mb-6 p-1 rounded-lg"
+        style={{
+          backgroundColor: 'var(--gray-100)',
+          border: '1px solid var(--gray-200)',
+        }}
+      >
+        {SUB_TAB_CONFIG.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveSubTab(tab.id)}
+            className="flex-1 px-4 py-2.5 rounded-md flex items-center justify-center gap-2 transition-all duration-200"
+            style={{
+              backgroundColor: activeSubTab === tab.id ? 'var(--white)' : 'transparent',
+              boxShadow: activeSubTab === tab.id ? 'var(--shadow-sm)' : 'none',
+              color: activeSubTab === tab.id ? 'var(--primary)' : 'var(--gray-500)',
+            }}
+            onMouseEnter={(e) => {
+              if (activeSubTab !== tab.id) {
+                e.currentTarget.style.backgroundColor = 'var(--gray-200)';
+                e.currentTarget.style.color = 'var(--gray-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeSubTab !== tab.id) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--gray-500)';
+              }
+            }}
           >
-            <LinkedInIcon />
-            View Profile
-          </a>
-        )}
-        <div className="flex items-center gap-2">
-          <span className="text-xs" style={{ color: 'var(--gray-500)' }}>
-            Confidence:
-          </span>
-          <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="w-2 h-2 rounded-full"
-                style={{
-                  backgroundColor: i <= Math.round(person.confidence_score * 5)
-                    ? 'var(--primary)'
-                    : 'var(--gray-200)',
-                }}
-              />
-            ))}
-          </div>
-        </div>
+            {tab.icon}
+            <span className="font-medium text-sm">{tab.label}</span>
+            <span
+              className="text-xs px-1.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: activeSubTab === tab.id ? 'var(--primary-light)' : 'var(--gray-200)',
+                color: activeSubTab === tab.id ? 'var(--primary)' : 'var(--gray-500)',
+              }}
+            >
+              {tab.id === 'companies' ? data.companies_using.length : totalPeople}
+            </span>
+          </button>
+        ))}
       </div>
 
-      {person.signals.length > 0 && (
-        <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--gray-200)' }}>
-          <div className="text-xs uppercase font-medium mb-2" style={{ color: 'var(--gray-500)' }}>
-            Discovery Signal
-          </div>
-          <p className="text-xs" style={{ color: 'var(--gray-500)' }}>
-            {person.signals[0].text}
-          </p>
-        </div>
+      {/* Sub-Tab Content */}
+      {activeSubTab === 'companies' && (
+        <CompaniesTable companies={data.companies_using} />
       )}
+      {activeSubTab === 'people' && (
+        <PeopleTable users={data.users} buyers={data.buyers} />
+      )}
+    </div>
+  );
+}
+
+function CompaniesTable({ companies }: { companies: CompanyUsing[] }) {
+  if (companies.length === 0) {
+    return (
+      <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
+        <div
+          className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: 'var(--gray-100)' }}
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+        </div>
+        <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--gray-900)' }}>
+          No Customer Companies Found
+        </h3>
+        <p>Click refresh to search for customer companies.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-sm mb-4" style={{ color: 'var(--gray-500)' }}>
+        Companies discovered as customers based on website content, press releases, and web search.
+      </p>
+      <div style={tableStyles.container}>
+        <div style={tableStyles.wrapper}>
+          <table style={tableStyles.table}>
+            <thead>
+              <tr>
+                <th style={{ ...tableStyles.th, ...tableStyles.tdFirst }}>Company</th>
+                <th style={tableStyles.th}>Domain</th>
+                <th style={tableStyles.th}>Industry</th>
+                <th style={tableStyles.th}>Size</th>
+                <th style={{ ...tableStyles.th, ...tableStyles.tdLast }}>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {companies.map((company, i) => (
+                <tr
+                  key={i}
+                  style={{ transition: 'background 150ms ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--gray-100)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <td style={{ ...tableStyles.td, ...tableStyles.tdFirst, fontWeight: 600 }}>
+                    {company.name}
+                  </td>
+                  <td style={tableStyles.td}>
+                    {company.domain ? (
+                      <a
+                        href={`https://${company.domain}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--primary)' }}
+                        className="hover:underline"
+                      >
+                        {company.domain}
+                      </a>
+                    ) : (
+                      <span style={{ color: 'var(--gray-400)' }}>—</span>
+                    )}
+                  </td>
+                  <td style={tableStyles.td}>
+                    {company.industry || <span style={{ color: 'var(--gray-400)' }}>—</span>}
+                  </td>
+                  <td style={tableStyles.td}>
+                    {company.size || <span style={{ color: 'var(--gray-400)' }}>—</span>}
+                  </td>
+                  <td style={{ ...tableStyles.td, ...tableStyles.tdLast }}>
+                    <span style={badgeStyles[company.confidence]}>
+                      {company.confidence}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PeopleTable({ users, buyers }: { users: DiscoveredPerson[]; buyers: DiscoveredPerson[] }) {
+  const allPeople = [...users, ...buyers];
+
+  if (allPeople.length === 0) {
+    return (
+      <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
+        <div
+          className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: 'var(--gray-100)' }}
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--gray-900)' }}>
+          No People Found Yet
+        </h3>
+        <p>People at customer companies will appear here after discovery.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-sm mb-4" style={{ color: 'var(--gray-500)' }}>
+        People at customer companies who likely use or buy this product, discovered via LinkedIn search.
+      </p>
+      <div style={tableStyles.container}>
+        <div style={tableStyles.wrapper}>
+          <table style={tableStyles.table}>
+            <thead>
+              <tr>
+                <th style={{ ...tableStyles.th, ...tableStyles.tdFirst }}>Name</th>
+                <th style={tableStyles.th}>Role</th>
+                <th style={tableStyles.th}>Company</th>
+                <th style={tableStyles.th}>Type</th>
+                <th style={tableStyles.th}>Confidence</th>
+                <th style={{ ...tableStyles.th, ...tableStyles.tdLast, textAlign: 'center' }}>Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allPeople.map((person, i) => (
+                <tr
+                  key={i}
+                  style={{ transition: 'background 150ms ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--gray-100)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <td style={{ ...tableStyles.td, ...tableStyles.tdFirst, fontWeight: 600 }}>
+                    {person.name}
+                  </td>
+                  <td style={tableStyles.td}>
+                    {person.role || <span style={{ color: 'var(--gray-400)' }}>—</span>}
+                  </td>
+                  <td style={tableStyles.td}>
+                    {person.company || <span style={{ color: 'var(--gray-400)' }}>—</span>}
+                  </td>
+                  <td style={tableStyles.td}>
+                    <span style={badgeStyles[person.type]}>
+                      {person.type}
+                    </span>
+                  </td>
+                  <td style={tableStyles.td}>
+                    <ConfidenceBar score={person.confidence_score} />
+                  </td>
+                  <td style={{ ...tableStyles.td, ...tableStyles.tdLast, textAlign: 'center' }}>
+                    {person.linkedin_url ? (
+                      <a
+                        href={person.linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.375rem',
+                          padding: '0.375rem 0.75rem',
+                          fontSize: '0.8125rem',
+                          border: '1px solid var(--gray-300)',
+                          borderRadius: '4px',
+                          backgroundColor: 'var(--white)',
+                          color: 'var(--gray-700)',
+                          textDecoration: 'none',
+                          transition: 'all 150ms ease',
+                        }}
+                        className="hover:bg-gray-100 hover:border-gray-400"
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--gray-100)';
+                          e.currentTarget.style.borderColor = 'var(--gray-400)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--white)';
+                          e.currentTarget.style.borderColor = 'var(--gray-300)';
+                        }}
+                      >
+                        <LinkedInIcon />
+                        View
+                      </a>
+                    ) : (
+                      <span style={{ color: 'var(--gray-400)' }}>—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ConfidenceBar({ score }: { score: number }) {
+  const percentage = Math.round(score * 100);
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div
+        style={{
+          height: '6px',
+          width: '60px',
+          backgroundColor: 'var(--gray-200)',
+          borderRadius: '3px',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            width: `${percentage}%`,
+            background: 'linear-gradient(90deg, var(--primary), var(--accent))',
+            borderRadius: '3px',
+            transition: 'width 250ms ease',
+          }}
+        />
+      </div>
+      <span style={{ fontSize: '0.75rem', color: 'var(--gray-600)', minWidth: '32px' }}>
+        {percentage}%
+      </span>
     </div>
   );
 }
@@ -231,7 +476,8 @@ function PersonCard({ person }: { person: DiscoveredPerson }) {
 function LinkedInIcon() {
   return (
     <svg
-      className="w-4 h-4"
+      width="14"
+      height="14"
       fill="currentColor"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
