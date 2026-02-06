@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { CompanyTabs } from '@/components/company-tabs';
+import { UserMenu } from '@/components/user-menu';
 import {
   CompanyResponse,
   StreamEvent,
@@ -180,7 +181,12 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--vaaya-white)' }}>
-      <div className="max-w-6xl mx-auto py-12 px-4">
+      {/* Header with user menu */}
+      <header className="flex justify-end p-4">
+        <UserMenu />
+      </header>
+
+      <div className="max-w-6xl mx-auto pb-12 px-4">
         {/* Back button */}
         <button
           onClick={() => router.push('/')}
