@@ -150,13 +150,13 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--vaaya-white)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--off-white)' }}>
         <div className="text-center">
           <div
-            className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-            style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+            className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
           />
-          <p style={{ color: 'var(--vaaya-text-muted)' }}>Loading company data...</p>
+          <p className="text-base" style={{ color: 'var(--gray-500)' }}>Loading company data...</p>
         </div>
       </div>
     );
@@ -164,13 +164,12 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--vaaya-white)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--off-white)' }}>
         <div className="text-center">
-          <p className="mb-4" style={{ color: 'var(--vaaya-text-muted)' }}>Company not found</p>
+          <p className="mb-4 text-lg" style={{ color: 'var(--gray-500)' }}>Company not found</p>
           <button
             onClick={() => router.push('/')}
-            className="hover:underline"
-            style={{ color: 'var(--vaaya-brand)' }}
+            className="btn btn-outline"
           >
             Go back to search
           </button>
@@ -180,45 +179,99 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
   }
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: 'var(--vaaya-white)' }}>
-      {/* Header with user menu */}
-      <header className="flex justify-end p-4">
-        <UserMenu />
-      </header>
+    <main className="min-h-screen" style={{ backgroundColor: 'var(--off-white)' }}>
+      {/* Header Bar */}
+      <div
+        className="sticky top-0 z-50"
+        style={{
+          background: 'rgba(248, 250, 250, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid var(--gray-200)',
+        }}
+      >
+        <div className="container-wide py-4 flex items-center justify-between">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all"
+            style={{ color: 'var(--gray-600)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--gray-100)';
+              e.currentTarget.style.color = 'var(--gray-900)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--gray-600)';
+            }}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="font-medium">Back</span>
+          </button>
 
-      <div className="max-w-6xl mx-auto pb-12 px-4">
-        {/* Back button */}
-        <button
-          onClick={() => router.push('/')}
-          className="text-sm mb-8 flex items-center gap-1 transition-colors"
-          style={{ color: 'var(--vaaya-text-muted)' }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--vaaya-text)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--vaaya-text-muted)'}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to search
-        </button>
-
-        {/* Company Header */}
-        <div className="flex items-center gap-6 mb-12">
-          {data.company.logo_url && (
-            <img
-              src={data.company.logo_url}
-              alt={data.company.name}
-              className="w-20 h-20 rounded-lg"
-              style={{ backgroundColor: 'var(--vaaya-white)' }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          )}
-          <div>
-            <h1 className="font-display text-5xl font-semibold tracking-tight leading-tight" style={{ color: 'var(--vaaya-text)' }}>
+          {/* Company Name in Header */}
+          <div className="flex items-center gap-3">
+            {data.company.logo_url && (
+              <img
+                src={data.company.logo_url}
+                alt={data.company.name}
+                className="w-8 h-8 rounded-md"
+                style={{ backgroundColor: 'var(--gray-100)' }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            )}
+            <span className="font-semibold" style={{ color: 'var(--gray-900)' }}>
               {data.company.name}
-            </h1>
-            <p className="text-lg font-mono" style={{ color: 'var(--vaaya-text-muted)' }}>{data.company.domain}</p>
+            </span>
+          </div>
+
+          {/* User Menu */}
+          <UserMenu />
+        </div>
+      </div>
+
+      <div className="container-wide py-8">
+        {/* Company Header */}
+        <div
+          className="mb-8 p-8 rounded-2xl"
+          style={{
+            background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)',
+            boxShadow: 'var(--shadow-lg)',
+          }}
+        >
+          <div className="flex items-center gap-6">
+            {data.company.logo_url && (
+              <div
+                className="p-2 rounded-xl"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)' }}
+              >
+                <img
+                  src={data.company.logo_url}
+                  alt={data.company.name}
+                  className="w-16 h-16 rounded-lg object-contain"
+                  style={{ backgroundColor: 'var(--white)' }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <div>
+              <h1
+                className="font-display text-4xl font-medium tracking-tight leading-tight"
+                style={{ color: 'var(--white)' }}
+              >
+                {data.company.name}
+              </h1>
+              <p
+                className="text-lg font-mono mt-1"
+                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                {data.company.domain}
+              </p>
+            </div>
           </div>
         </div>
 

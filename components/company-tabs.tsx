@@ -14,10 +14,33 @@ interface CompanyTabsProps {
 }
 
 const TAB_CONFIG = [
-  { id: 'dashboard' as const, label: 'Dashboard' },
-  { id: 'product' as const, label: 'Product' },
-  { id: 'business' as const, label: 'Business' },
-  { id: 'person' as const, label: 'Person' },
+  { id: 'dashboard' as const, label: 'Dashboard', icon: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="9" />
+      <rect x="14" y="3" width="7" height="5" />
+      <rect x="14" y="12" width="7" height="9" />
+      <rect x="3" y="16" width="7" height="5" />
+    </svg>
+  )},
+  { id: 'product' as const, label: 'Product', icon: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+      <line x1="12" y1="22.08" x2="12" y2="12" />
+    </svg>
+  )},
+  { id: 'business' as const, label: 'Business', icon: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </svg>
+  )},
+  { id: 'person' as const, label: 'Person', icon: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  )},
 ];
 
 export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) {
@@ -41,66 +64,86 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
   return (
     <div>
       {/* Tab Headers */}
-      <div className="flex mb-8" style={{ borderBottom: '1px solid var(--vaaya-border)' }}>
+      <div
+        className="flex gap-1 mb-6 p-1 rounded-xl"
+        style={{
+          backgroundColor: 'var(--gray-100)',
+          border: '1px solid var(--gray-200)',
+        }}
+      >
         {TAB_CONFIG.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className="px-6 py-3 -mb-px transition-colors"
+            className="flex-1 px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
             style={{
-              borderBottom: activeTab === tab.id ? '2px solid var(--vaaya-brand)' : '2px solid transparent',
+              backgroundColor: activeTab === tab.id ? 'var(--white)' : 'transparent',
+              boxShadow: activeTab === tab.id ? 'var(--shadow-sm)' : 'none',
+              color: activeTab === tab.id ? 'var(--primary)' : 'var(--gray-500)',
             }}
             onMouseEnter={(e) => {
               if (activeTab !== tab.id) {
-                const label = e.currentTarget.querySelector('.tab-label') as HTMLElement;
-                if (label) label.style.color = 'var(--vaaya-text)';
+                e.currentTarget.style.backgroundColor = 'var(--gray-200)';
+                e.currentTarget.style.color = 'var(--gray-700)';
               }
             }}
             onMouseLeave={(e) => {
               if (activeTab !== tab.id) {
-                const label = e.currentTarget.querySelector('.tab-label') as HTMLElement;
-                if (label) label.style.color = 'var(--vaaya-text-muted)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--gray-500)';
               }
             }}
           >
-            <div
-              className="tab-label text-base font-semibold transition-colors"
-              style={{
-                color: activeTab === tab.id ? 'var(--vaaya-brand)' : 'var(--vaaya-text-muted)',
-              }}
-            >
+            {tab.icon}
+            <span className="font-semibold text-sm">
               {tab.label}
-              {tabsLoading[tab.id] && (
-                <span
-                  className="ml-2 inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-                  style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
-                />
-              )}
-            </div>
+            </span>
+            {tabsLoading[tab.id] && (
+              <span
+                className="ml-1 inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
+              />
+            )}
           </button>
         ))}
       </div>
 
       {/* Tab Content */}
       <div
-        className="bento-box rounded-xl shadow-md"
+        className="dashboard-card"
         style={{
-          backgroundColor: 'var(--vaaya-white)',
-          border: '1px solid var(--vaaya-border)',
+          backgroundColor: 'var(--white)',
+          border: '1px solid var(--gray-200)',
+          borderRadius: 'var(--radius-xl)',
         }}
       >
         {/* Refresh Header */}
         <div
-          className="flex items-center justify-between px-8 py-4"
-          style={{ borderBottom: '1px solid var(--vaaya-border)' }}
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: '1px solid var(--gray-200)' }}
         >
-          <div className="text-xs uppercase tracking-wide font-medium" style={{ color: 'var(--vaaya-text-muted)' }}>
+          <div
+            className="text-xs uppercase tracking-wider font-semibold"
+            style={{ color: 'var(--gray-500)' }}
+          >
             {tabData.updated_at ? (
-              <>Last updated: {new Date(tabData.updated_at).toLocaleString()}</>
+              <span className="flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Last updated: {new Date(tabData.updated_at).toLocaleString()}
+              </span>
             ) : tabsLoading[activeTab] ? (
-              <>Loading...</>
+              <span className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                  style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
+                />
+                Loading...
+              </span>
             ) : (
-              <>Not yet loaded</>
+              <span>Not yet loaded</span>
             )}
           </div>
           <RefreshButton
@@ -110,15 +153,17 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
         </div>
 
         {/* Content */}
-        <div className="p-8">
+        <div className="p-6">
           {tabsLoading[activeTab] && !tabData.updated_at ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-16">
               <div className="text-center">
                 <div
-                  className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-                  style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+                  className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+                  style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
                 />
-                <p style={{ color: 'var(--vaaya-text-muted)' }}>Fetching data...</p>
+                <p className="font-medium" style={{ color: 'var(--gray-500)' }}>
+                  Fetching data...
+                </p>
               </div>
             </div>
           ) : (
@@ -138,10 +183,22 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
 // Placeholder for Person tab (not yet implemented)
 function PersonTabPlaceholder() {
   return (
-    <div className="text-center py-12" style={{ color: 'var(--vaaya-text-muted)' }}>
-      <div className="text-4xl mb-4">👤</div>
-      <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--vaaya-text)' }}>Person Tab Coming Soon</h3>
-      <p>Discovered users and buyers will appear here.</p>
+    <div className="text-center py-16">
+      <div
+        className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: 'var(--gray-100)' }}
+      >
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </div>
+      <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--gray-900)' }}>
+        Person Tab Coming Soon
+      </h3>
+      <p style={{ color: 'var(--gray-500)' }}>
+        Discovered users and buyers will appear here.
+      </p>
     </div>
   );
 }

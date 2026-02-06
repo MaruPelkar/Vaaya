@@ -8,37 +8,37 @@ interface ChipProps {
 
 const VARIANT_STYLES: Record<string, { bg: string; text: string; border?: string }> = {
   category: {
-    bg: 'rgba(7, 59, 57, 0.1)',
-    text: 'var(--vaaya-brand)',
+    bg: 'rgba(26, 107, 107, 0.1)',
+    text: 'var(--primary)',
   },
   platform: {
-    bg: 'rgba(99, 102, 241, 0.1)',
-    text: '#4F46E5',
+    bg: 'var(--info-bg)',
+    text: 'var(--info)',
   },
   icp: {
-    bg: 'rgba(16, 185, 129, 0.1)',
-    text: '#059669',
+    bg: 'var(--success-bg)',
+    text: 'var(--success)',
   },
   persona: {
-    bg: 'rgba(245, 158, 11, 0.1)',
-    text: '#D97706',
+    bg: 'var(--warning-bg)',
+    text: 'var(--warning)',
   },
   small: {
-    bg: 'var(--vaaya-neutral)',
-    text: 'var(--vaaya-text-muted)',
+    bg: 'var(--gray-100)',
+    text: 'var(--gray-600)',
   },
   change_type: {
-    bg: 'var(--vaaya-neutral)',
-    text: 'var(--vaaya-text-muted)',
+    bg: 'var(--gray-100)',
+    text: 'var(--gray-600)',
   },
 };
 
 const CHANGE_TYPE_STYLES: Record<string, { bg: string; text: string }> = {
-  product_launch: { bg: 'rgba(16, 185, 129, 0.1)', text: '#059669' },
-  pricing_change: { bg: 'rgba(245, 158, 11, 0.1)', text: '#D97706' },
-  funding: { bg: 'rgba(99, 102, 241, 0.1)', text: '#4F46E5' },
+  product_launch: { bg: 'var(--success-bg)', text: 'var(--success)' },
+  pricing_change: { bg: 'var(--warning-bg)', text: 'var(--warning)' },
+  funding: { bg: 'var(--info-bg)', text: 'var(--info)' },
   acquisition: { bg: 'rgba(147, 51, 234, 0.1)', text: '#7C3AED' },
-  leadership: { bg: 'rgba(59, 130, 246, 0.1)', text: '#2563EB' },
+  leadership: { bg: 'var(--info-bg)', text: 'var(--info)' },
   partnership: { bg: 'rgba(6, 182, 212, 0.1)', text: '#0891B2' },
   positioning: { bg: 'rgba(236, 72, 153, 0.1)', text: '#DB2777' },
 };
@@ -67,7 +67,7 @@ export function Chip({ children, variant = 'category', changeType }: ChipProps) 
 
   return (
     <span
-      className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+      className="badge"
       style={{
         backgroundColor: styles.bg,
         color: styles.text,
@@ -81,21 +81,23 @@ export function Chip({ children, variant = 'category', changeType }: ChipProps) 
 // Plan gate chip for Product tab
 export function PlanGateChip({ gate }: { gate: string }) {
   const gateStyles: Record<string, { bg: string; text: string }> = {
-    free: { bg: 'rgba(16, 185, 129, 0.1)', text: '#059669' },
-    starter: { bg: 'rgba(59, 130, 246, 0.1)', text: '#2563EB' },
+    free: { bg: 'var(--success-bg)', text: 'var(--success)' },
+    starter: { bg: 'var(--info-bg)', text: 'var(--info)' },
     pro: { bg: 'rgba(99, 102, 241, 0.1)', text: '#4F46E5' },
     enterprise: { bg: 'rgba(147, 51, 234, 0.1)', text: '#7C3AED' },
-    all: { bg: 'var(--vaaya-neutral)', text: 'var(--vaaya-text-muted)' },
+    all: { bg: 'var(--gray-100)', text: 'var(--gray-600)' },
   };
 
   const styles = gateStyles[gate] || gateStyles.all;
 
   return (
     <span
-      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+      className="badge"
       style={{
         backgroundColor: styles.bg,
         color: styles.text,
+        padding: '0.2rem 0.5rem',
+        fontSize: '0.625rem',
       }}
     >
       {gate.charAt(0).toUpperCase() + gate.slice(1)}
@@ -105,30 +107,37 @@ export function PlanGateChip({ gate }: { gate: string }) {
 
 // Confidence chip for People tab
 export function ConfidenceChip({ score }: { score: number }) {
-  let color: string;
+  let bgColor: string;
+  let textColor: string;
   let label: string;
 
   if (score >= 70) {
-    color = '#059669';
+    bgColor = 'var(--success-bg)';
+    textColor = 'var(--success)';
     label = 'High';
   } else if (score >= 40) {
-    color = '#D97706';
+    bgColor = 'var(--warning-bg)';
+    textColor = 'var(--warning)';
     label = 'Medium';
   } else {
-    color = '#6B7280';
+    bgColor = 'var(--gray-100)';
+    textColor = 'var(--gray-600)';
     label = 'Low';
   }
 
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
+      className="badge"
       style={{
-        backgroundColor: `${color}15`,
-        color,
+        backgroundColor: bgColor,
+        color: textColor,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.25rem',
       }}
     >
       <span className="font-bold">{score}</span>
-      <span className="opacity-70">{label}</span>
+      <span style={{ opacity: 0.7 }}>{label}</span>
     </span>
   );
 }

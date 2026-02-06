@@ -11,28 +11,22 @@ export function ProgressBar({ label, value, showValue = true }: ProgressBarProps
   const clampedValue = Math.max(0, Math.min(100, value));
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       <div className="flex-1">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-xs" style={{ color: 'var(--vaaya-text)' }}>
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-sm font-medium" style={{ color: 'var(--gray-700)' }}>
             {label}
           </span>
           {showValue && (
-            <span className="text-xs font-medium" style={{ color: 'var(--vaaya-text-muted)' }}>
+            <span className="text-xs font-semibold" style={{ color: 'var(--gray-500)' }}>
               {clampedValue}%
             </span>
           )}
         </div>
-        <div
-          className="h-1.5 rounded-full overflow-hidden"
-          style={{ backgroundColor: 'var(--vaaya-border)' }}
-        >
+        <div className="progress-bar">
           <div
-            className="h-full rounded-full transition-all duration-300"
-            style={{
-              width: `${clampedValue}%`,
-              backgroundColor: 'var(--vaaya-brand)',
-            }}
+            className="progress-fill"
+            style={{ width: `${clampedValue}%` }}
           />
         </div>
       </div>
