@@ -84,7 +84,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="text-center mb-10">
             <img
-              src="/logo.png"
+              src="https://res.cloudinary.com/dwqe7wif1/image/upload/v1770353291/modernlogo_pozhd7.png"
               alt="Vaaya"
               className="w-20 h-20 mx-auto mb-6 rounded-2xl"
               style={{ boxShadow: 'var(--shadow-lg)' }}
