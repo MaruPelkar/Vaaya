@@ -208,4 +208,87 @@ export async function searchCustomerMentions(
   return searchGoogle(query, { num: options?.limit || 10 });
 }
 
+// ============================================================================
+// High-Intent Discovery Search Functions
+// ============================================================================
+
+/**
+ * Search for product reviews on G2
+ */
+export async function searchG2Reviews(
+  productName: string,
+  options?: { limit?: number }
+): Promise<SerpSearchResult> {
+  const query = `site:g2.com/products "${productName}" reviews`;
+  return searchGoogle(query, { num: options?.limit || 10 });
+}
+
+/**
+ * Search for product reviews on Capterra
+ */
+export async function searchCapterraReviews(
+  productName: string,
+  options?: { limit?: number }
+): Promise<SerpSearchResult> {
+  const query = `site:capterra.com "${productName}" reviews`;
+  return searchGoogle(query, { num: options?.limit || 10 });
+}
+
+/**
+ * Search for product on Product Hunt
+ */
+export async function searchProductHunt(
+  productName: string,
+  options?: { limit?: number }
+): Promise<SerpSearchResult> {
+  const query = `site:producthunt.com/posts "${productName}"`;
+  return searchGoogle(query, { num: options?.limit || 5 });
+}
+
+/**
+ * Search for job postings that mention experience with a specific product/tool
+ */
+export async function searchJobPostings(
+  productName: string,
+  options?: { limit?: number }
+): Promise<SerpSearchResult> {
+  // Search across multiple job sites for positions requiring the product
+  const query = `("experience with ${productName}" OR "${productName} required" OR "${productName} preferred") (site:linkedin.com/jobs OR site:indeed.com OR site:greenhouse.io OR site:lever.co OR site:jobs.ashbyhq.com)`;
+  return searchGoogle(query, { num: options?.limit || 15 });
+}
+
+/**
+ * Search for LinkedIn posts mentioning the product (user testimonials, implementation stories)
+ */
+export async function searchLinkedInPosts(
+  productName: string,
+  options?: { limit?: number }
+): Promise<SerpSearchResult> {
+  // Search for LinkedIn posts/articles from actual users
+  const query = `site:linkedin.com ("we use ${productName}" OR "switched to ${productName}" OR "implemented ${productName}" OR "love using ${productName}" OR "${productName} has been" OR "our team uses ${productName}")`;
+  return searchGoogle(query, { num: options?.limit || 10 });
+}
+
+/**
+ * Search for YouTube videos about the product (demos, webinars, tutorials, case studies)
+ */
+export async function searchYouTubeVideos(
+  productName: string,
+  options?: { limit?: number }
+): Promise<SerpSearchResult> {
+  const query = `site:youtube.com "${productName}" (demo OR webinar OR tutorial OR "case study" OR review OR walkthrough)`;
+  return searchGoogle(query, { num: options?.limit || 10 });
+}
+
+/**
+ * Search for webinar and conference content featuring the product
+ */
+export async function searchWebinars(
+  productName: string,
+  options?: { limit?: number }
+): Promise<SerpSearchResult> {
+  const query = `"${productName}" (webinar OR "customer story" OR "case study" OR conference OR summit) (speaker OR presenter OR featuring)`;
+  return searchGoogle(query, { num: options?.limit || 10 });
+}
+
 export { serpApiKey };

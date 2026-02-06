@@ -308,14 +308,29 @@ export interface DiscoveredPerson {
   role: string | null;
   type: 'user' | 'buyer' | 'evaluator';
   linkedin_url: string | null;
+  email: string | null;
+  phone: string | null;
   confidence_score: number;
   signals: PersonSignal[];
 }
 
+export type PersonSignalSource =
+  | 'linkedin_search'
+  | 'nyne_search'
+  | 'g2_review'
+  | 'capterra_review'
+  | 'producthunt'
+  | 'job_posting'
+  | 'linkedin_post'
+  | 'youtube_video'
+  | 'webinar'
+  | 'website'
+  | 'press_release';
+
 export interface PersonSignal {
-  source: string;
+  source: PersonSignalSource | string;
   text: string;
-  url: string;
+  url: string | null;
   date: string | null;
 }
 

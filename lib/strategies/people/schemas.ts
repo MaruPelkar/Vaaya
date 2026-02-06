@@ -51,9 +51,17 @@ export const CUSTOMER_EXTRACTION_SCHEMA = {
 
 export const CUSTOMER_EXTRACTION_PROMPT = `You are a B2B research analyst identifying customer companies and target personas.
 
-Your task is to analyze the provided website content (press releases, customer pages, case studies) and extract:
+Your task is to analyze content from multiple discovery sources and extract:
 1. Companies that are CONFIRMED customers of the target company
 2. Target personas who would use or buy this type of product
+
+## Content Sources You'll See:
+- Website content: Homepage, customers page, case studies, press releases
+- G2/Capterra reviews: Verified reviews from actual users
+- Product Hunt: Product launch discussions and upvotes
+- Job postings: Companies hiring for roles requiring experience with the product
+- LinkedIn posts: Users publicly sharing their experience with the product
+- YouTube/Webinars: Video content featuring speakers discussing the product
 
 ## Guidelines for CUSTOMERS:
 
@@ -62,17 +70,21 @@ Only include companies with clear evidence of being a customer:
 - Listed on a "customers" or "trusted by" page
 - Case study or success story
 - Press release about partnership/adoption
-- Mentioned as using the product in an article
+- G2/Capterra reviewer's company
+- Company posting jobs requiring the product
+- LinkedIn user's company who mentions using the product
+- Webinar speaker's company
 
 Do NOT include:
 - Integration partners (companies they integrate WITH, not customers)
 - Technology partners or investors
 - Companies just mentioned for comparison
 - Companies that are prospects or leads
+- Vendors or consultants (unless they are also customers)
 
 Confidence levels:
-- "high": Direct quote, case study, or explicit customer statement
-- "medium": Logo on customers page, mentioned as user in article
+- "high": Direct quote, case study, G2 review, LinkedIn post from user
+- "medium": Logo on customers page, mentioned in article, job posting
 - "low": Indirect mention, might be using the product
 
 For each customer:
@@ -94,6 +106,7 @@ Examples by product type:
 - Design tool: users=Product Designer, UX Designer; buyers=Head of Design, VP Product
 - HR tool: users=HR Coordinator, Recruiter; buyers=VP HR, Chief People Officer
 - Finance tool: users=Accountant, Financial Analyst; buyers=CFO, Controller
+- Legal tool: users=Paralegal, Legal Ops; buyers=General Counsel, VP Legal
 
 Include 3-5 personas total across the types.
 
@@ -101,7 +114,8 @@ Include 3-5 personas total across the types.
 - Be precise and factual
 - Only include what is clearly supported by the content
 - Use empty arrays if no customers or personas can be identified
-- Do not hallucinate or make up companies`;
+- Do not hallucinate or make up companies
+- Job postings are high-quality signals: companies hiring for product experience are confirmed users`;
 
 export const PEOPLE_CONSOLIDATION_SCHEMA = {
   type: 'object',
