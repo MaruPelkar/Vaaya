@@ -3,6 +3,7 @@ import { createClient } from '@/lib/db';
 import { executeDashboardStrategies } from '@/lib/strategies/dashboard';
 import { executeProductStrategies } from '@/lib/strategies/product';
 import { executeBusinessStrategies } from '@/lib/strategies/business';
+import { executePeopleStrategies } from '@/lib/strategies/people';
 import {
   TabId,
   getEmptyProductData,
@@ -170,22 +171,23 @@ export async function GET(
           }
         })(),
 
-        // Person Tab (placeholder - returns empty data for now)
+        // Person Tab - discovers customers and finds relevant personas
         (async () => {
           await sendEvent({ type: 'tab_started', tab: 'person' as TabId });
           try {
-            const emptyData = getEmptyPersonData();
+            const result = await executePeopleStrategies(domain, companyName);
+
             await supabase.from('companies').update({
-              person_data: emptyData,
+              person_data: result.data,
               person_updated_at: new Date().toISOString(),
-              person_sources: [],
+              person_sources: result.sources,
             }).eq('domain', domain);
 
             await sendEvent({
               type: 'tab_complete',
               tab: 'person' as TabId,
-              data: emptyData,
-              sources: [],
+              data: result.data,
+              sources: result.sources,
             });
           } catch (error) {
             console.error('Person tab error:', error);

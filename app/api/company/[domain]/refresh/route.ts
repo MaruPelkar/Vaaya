@@ -3,9 +3,9 @@ import { createClient } from '@/lib/db';
 import { executeDashboardStrategies } from '@/lib/strategies/dashboard';
 import { executeProductStrategies } from '@/lib/strategies/product';
 import { executeBusinessStrategies } from '@/lib/strategies/business';
+import { executePeopleStrategies } from '@/lib/strategies/people';
 import {
   TabId,
-  getEmptyPersonData,
 } from '@/lib/types';
 
 export const maxDuration = 60;
@@ -59,8 +59,7 @@ export async function POST(
         break;
 
       case 'person':
-        // TODO: Implement person strategies
-        result = { data: getEmptyPersonData(), sources: [] };
+        result = await executePeopleStrategies(domain, companyName);
         await supabase.from('companies').update({
           person_data: result.data,
           person_updated_at: new Date().toISOString(),
