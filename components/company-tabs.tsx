@@ -5,6 +5,7 @@ import { CompanyResponse, TabId } from '@/lib/types';
 import { DashboardTab } from './tabs/dashboard-tab';
 import { ProductTab } from './tabs/product-tab';
 import { BusinessTab } from './tabs/business-tab';
+import { PersonTab } from './tabs/person-tab';
 import { RefreshButton } from './refresh-button';
 
 interface CompanyTabsProps {
@@ -171,34 +172,11 @@ export function CompanyTabs({ data, tabsLoading, onRefresh }: CompanyTabsProps) 
               {activeTab === 'dashboard' && <DashboardTab data={data.dashboard.data} />}
               {activeTab === 'product' && <ProductTab data={data.product.data} />}
               {activeTab === 'business' && <BusinessTab data={data.business.data} />}
-              {activeTab === 'person' && <PersonTabPlaceholder />}
+              {activeTab === 'person' && <PersonTab data={data.person.data} />}
             </>
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-// Placeholder for Person tab (not yet implemented)
-function PersonTabPlaceholder() {
-  return (
-    <div className="text-center py-16">
-      <div
-        className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-        style={{ backgroundColor: 'var(--gray-100)' }}
-      >
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      </div>
-      <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--gray-900)' }}>
-        Person Tab Coming Soon
-      </h3>
-      <p style={{ color: 'var(--gray-500)' }}>
-        Discovered users and buyers will appear here.
-      </p>
     </div>
   );
 }
