@@ -26,67 +26,127 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--vaaya-white)' }}>
-      <div className="w-full max-w-md px-8">
-        {/* Logo/Brand */}
-        <div className="text-center mb-12">
-          <h1 className="font-display text-5xl font-semibold tracking-tight mb-4" style={{ color: 'var(--vaaya-text)' }}>
-            Vaaya
-          </h1>
-          <p className="text-body" style={{ color: 'var(--vaaya-text-muted)' }}>
-            Company Intelligence at your fingertips
-          </p>
-        </div>
+    <main className="min-h-screen flex gradient-primary relative overflow-hidden">
+      {/* Background decoration */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(circle at 20% 50%, rgba(77, 168, 168, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(61, 148, 148, 0.15) 0%, transparent 50%)
+          `,
+        }}
+      />
 
-        {/* Login Card */}
+      {/* Left side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 relative z-10">
+        <div className="max-w-lg">
+          <h1 className="headline-display text-white mb-6">
+            Company Intelligence<br />
+            <span style={{ fontStyle: 'italic' }}>Reimagined.</span>
+          </h1>
+          <p className="text-lg leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+            Research any B2B company in seconds. Get deep insights on product, pricing, positioning, and competitive landscape.
+          </p>
+
+          {/* Feature highlights */}
+          <div className="mt-12 space-y-4">
+            {[
+              'Real-time competitive analysis',
+              'Product & pricing intelligence',
+              'Market positioning insights',
+            ].map((feature, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <span style={{ color: 'rgba(255, 255, 255, 0.9)' }}>{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Login form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
         <div
-          className="rounded-xl p-8"
+          className="w-full max-w-md p-10 rounded-2xl"
           style={{
-            backgroundColor: 'var(--vaaya-white)',
-            border: '1px solid var(--vaaya-border)',
+            backgroundColor: 'var(--white)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           }}
         >
-          <h2 className="text-xl font-semibold mb-6 text-center" style={{ color: 'var(--vaaya-text)' }}>
-            Sign in to continue
-          </h2>
-
-          {error && (
+          {/* Logo */}
+          <div className="text-center mb-10">
             <div
-              className="mb-6 p-4 rounded-lg text-sm"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6"
               style={{
-                backgroundColor: '#FEE2E2',
-                color: '#DC2626',
-                border: '1px solid #FECACA'
+                background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)',
               }}
             >
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </div>
+            <h1 className="font-display text-3xl font-medium mb-2" style={{ color: 'var(--gray-900)' }}>
+              Welcome back
+            </h1>
+            <p className="text-base" style={{ color: 'var(--gray-500)' }}>
+              Sign in to access your dashboard
+            </p>
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <div
+              className="mb-6 p-4 rounded-lg text-sm flex items-center gap-3"
+              style={{
+                backgroundColor: 'var(--error-bg)',
+                color: 'var(--error)',
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
               {error}
             </div>
           )}
 
+          {/* Google Sign In Button */}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-lg font-medium transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all duration-200"
             style={{
-              backgroundColor: loading ? 'var(--vaaya-neutral)' : 'var(--vaaya-white)',
-              border: '2px solid var(--vaaya-border)',
-              color: 'var(--vaaya-text)',
+              backgroundColor: loading ? 'var(--gray-100)' : 'var(--white)',
+              border: '2px solid var(--gray-200)',
+              color: 'var(--gray-800)',
+              cursor: loading ? 'not-allowed' : 'pointer',
             }}
             onMouseEnter={(e) => {
               if (!loading) {
-                e.currentTarget.style.borderColor = 'var(--vaaya-brand)';
-                e.currentTarget.style.backgroundColor = 'var(--vaaya-neutral)';
+                e.currentTarget.style.borderColor = 'var(--primary)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(26, 107, 107, 0.1)';
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--vaaya-border)';
-              e.currentTarget.style.backgroundColor = loading ? 'var(--vaaya-neutral)' : 'var(--vaaya-white)';
+              e.currentTarget.style.borderColor = 'var(--gray-200)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           >
             {loading ? (
               <div
                 className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-                style={{ borderColor: 'var(--vaaya-brand)', borderTopColor: 'transparent' }}
+                style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
               />
             ) : (
               <>
@@ -114,10 +174,49 @@ export default function LoginPage() {
             )}
           </button>
 
-          <p className="mt-6 text-center text-sm" style={{ color: 'var(--vaaya-text-muted)' }}>
-            By signing in, you agree to our Terms of Service and Privacy Policy.
+          {/* Divider */}
+          <div className="flex items-center gap-4 my-8">
+            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--gray-200)' }}></div>
+            <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--gray-400)' }}>
+              Secure login
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--gray-200)' }}></div>
+          </div>
+
+          {/* Trust indicators */}
+          <div className="flex items-center justify-center gap-6 mb-8">
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--gray-500)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>SSL Encrypted</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--gray-500)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span>SOC 2 Compliant</span>
+            </div>
+          </div>
+
+          {/* Terms */}
+          <p className="text-center text-xs" style={{ color: 'var(--gray-500)' }}>
+            By signing in, you agree to our{' '}
+            <a href="#" className="underline hover:no-underline" style={{ color: 'var(--primary)' }}>
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href="#" className="underline hover:no-underline" style={{ color: 'var(--primary)' }}>
+              Privacy Policy
+            </a>
           </p>
         </div>
+      </div>
+
+      {/* Mobile branding (shown on small screens) */}
+      <div className="lg:hidden absolute top-8 left-0 right-0 text-center">
+        <h2 className="font-display text-2xl text-white">Company Intelligence</h2>
       </div>
     </main>
   );

@@ -14,8 +14,8 @@ export default function HomePage() {
   return (
     <main className="hero gradient-primary relative">
       {/* Header with user menu */}
-      <header className="absolute top-0 right-0 p-4 z-10">
-        <UserMenu />
+      <header className="absolute top-0 right-0 p-6 z-10">
+        <UserMenu variant="dark" />
       </header>
 
       <div className="hero-content animate-fade-in-up">
