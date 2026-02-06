@@ -468,3 +468,22 @@ export function getEmptyPersonData(): PersonData {
     generated_at: new Date().toISOString(),
   };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// USER PROFILE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  preferences: UserPreferences;
+  saved_companies: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserPreferences {
+  [key: string]: unknown;
+}

@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { CompanyTabs } from '@/components/company-tabs';
+import { UserMenu } from '@/components/user-menu';
 import {
   CompanyResponse,
   StreamEvent,
@@ -226,7 +227,8 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
             </span>
           </div>
 
-          <div style={{ width: '80px' }}></div>
+          {/* User Menu */}
+          <UserMenu />
         </div>
       </div>
 

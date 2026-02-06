@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
+import { UserMenu } from '@/components/user-menu';
 
 export default function HomePage() {
   const router = useRouter();
@@ -11,7 +12,12 @@ export default function HomePage() {
   };
 
   return (
-    <main className="hero gradient-primary">
+    <main className="hero gradient-primary relative">
+      {/* Header with user menu */}
+      <header className="absolute top-0 right-0 p-4 z-10">
+        <UserMenu />
+      </header>
+
       <div className="hero-content animate-fade-in-up">
         <span className="eyebrow text-white" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
           COMPANY INTELLIGENCE
