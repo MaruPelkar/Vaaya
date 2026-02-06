@@ -1,10 +1,38 @@
 'use client';
 
+import { useState } from 'react';
 import { PersonData, DiscoveredPerson, CompanyUsing } from '@/lib/types';
 
 interface PersonTabProps {
   data: PersonData | null;
 }
+
+type SubTabId = 'companies' | 'people';
+
+const SUB_TAB_CONFIG = [
+  {
+    id: 'companies' as const,
+    label: 'Customer Companies',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    )
+  },
+  {
+    id: 'people' as const,
+    label: 'People',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    )
+  },
+];
 
 const CONFIDENCE_COLORS: Record<string, string> = {
   high: 'bg-green-100 text-green-700',
@@ -19,6 +47,8 @@ const PERSONA_TYPE_COLORS: Record<string, string> = {
 };
 
 export function PersonTab({ data }: PersonTabProps) {
+  const [activeSubTab, setActiveSubTab] = useState<SubTabId>('companies');
+
   if (!data) {
     return (
       <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
@@ -31,8 +61,9 @@ export function PersonTab({ data }: PersonTabProps) {
   const hasUsers = data.users.length > 0;
   const hasBuyers = data.buyers.length > 0;
   const hasPeople = hasUsers || hasBuyers;
+  const totalPeople = data.users.length + data.buyers.length;
 
-  // Empty state when no data
+  // Empty state when no data at all
   if (!hasCompanies && !hasPeople) {
     return (
       <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
@@ -44,65 +75,176 @@ export function PersonTab({ data }: PersonTabProps) {
   }
 
   return (
-    <div className="space-y-10">
-      {/* Customer Companies */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-2xl font-semibold" style={{ color: 'var(--gray-900)' }}>
-            Customer Companies
-          </h3>
-          {hasCompanies && (
-            <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
-              {data.companies_using.length} discovered
+    <div>
+      {/* Sub-Tab Navigation */}
+      <div
+        className="flex gap-2 mb-6 p-1 rounded-lg"
+        style={{
+          backgroundColor: 'var(--gray-100)',
+          border: '1px solid var(--gray-200)',
+        }}
+      >
+        {SUB_TAB_CONFIG.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveSubTab(tab.id)}
+            className="flex-1 px-4 py-2.5 rounded-md flex items-center justify-center gap-2 transition-all duration-200"
+            style={{
+              backgroundColor: activeSubTab === tab.id ? 'var(--white)' : 'transparent',
+              boxShadow: activeSubTab === tab.id ? 'var(--shadow-sm)' : 'none',
+              color: activeSubTab === tab.id ? 'var(--primary)' : 'var(--gray-500)',
+            }}
+            onMouseEnter={(e) => {
+              if (activeSubTab !== tab.id) {
+                e.currentTarget.style.backgroundColor = 'var(--gray-200)';
+                e.currentTarget.style.color = 'var(--gray-700)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeSubTab !== tab.id) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--gray-500)';
+              }
+            }}
+          >
+            {tab.icon}
+            <span className="font-medium text-sm">{tab.label}</span>
+            <span
+              className="text-xs px-1.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: activeSubTab === tab.id ? 'var(--primary-light)' : 'var(--gray-200)',
+                color: activeSubTab === tab.id ? 'var(--primary)' : 'var(--gray-500)',
+              }}
+            >
+              {tab.id === 'companies' ? data.companies_using.length : totalPeople}
             </span>
-          )}
+          </button>
+        ))}
+      </div>
+
+      {/* Sub-Tab Content */}
+      {activeSubTab === 'companies' && (
+        <CompaniesSubTab companies={data.companies_using} />
+      )}
+      {activeSubTab === 'people' && (
+        <PeopleSubTab users={data.users} buyers={data.buyers} />
+      )}
+    </div>
+  );
+}
+
+function CompaniesSubTab({ companies }: { companies: CompanyUsing[] }) {
+  if (companies.length === 0) {
+    return (
+      <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
+        <div
+          className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: 'var(--gray-100)' }}
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
         </div>
+        <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--gray-900)' }}>
+          No Customer Companies Found
+        </h3>
+        <p>Click refresh to search for customer companies.</p>
+      </div>
+    );
+  }
 
-        {hasCompanies ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.companies_using.map((company, i) => (
-              <CompanyCard key={i} company={company} />
-            ))}
-          </div>
-        ) : (
-          <div className="dashboard-card rounded-lg p-8 text-center" style={{ color: 'var(--gray-500)' }}>
-            No customer companies discovered yet
-          </div>
-        )}
-      </section>
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm" style={{ color: 'var(--gray-500)' }}>
+          Companies discovered as customers based on website content, press releases, and web search.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {companies.map((company, i) => (
+          <CompanyCard key={i} company={company} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-      {/* Users - Daily product users */}
-      {hasUsers && (
+function PeopleSubTab({ users, buyers }: { users: DiscoveredPerson[]; buyers: DiscoveredPerson[] }) {
+  const allPeople = [...users, ...buyers];
+
+  if (allPeople.length === 0) {
+    return (
+      <div className="text-center py-12" style={{ color: 'var(--gray-500)' }}>
+        <div
+          className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: 'var(--gray-100)' }}
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--gray-900)' }}>
+          No People Found Yet
+        </h3>
+        <p>People at customer companies will appear here after discovery.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <p className="text-sm" style={{ color: 'var(--gray-500)' }}>
+        People at customer companies who likely use or buy this product, discovered via LinkedIn search.
+      </p>
+
+      {/* Users Section */}
+      {users.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-display text-2xl font-semibold" style={{ color: 'var(--gray-900)' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <h4 className="font-semibold text-lg" style={{ color: 'var(--gray-900)' }}>
               Users
-            </h3>
-            <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
-              {data.users.length} people
+            </h4>
+            <span
+              className="text-xs px-2 py-1 rounded-full"
+              style={{ backgroundColor: 'var(--blue-100)', color: 'var(--blue-700)' }}
+            >
+              {users.length} people
+            </span>
+            <span className="text-xs" style={{ color: 'var(--gray-400)' }}>
+              Daily product users
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.users.map((person, i) => (
+            {users.map((person, i) => (
               <PersonCard key={i} person={person} />
             ))}
           </div>
         </section>
       )}
 
-      {/* Buyers - Decision makers */}
-      {hasBuyers && (
+      {/* Buyers Section */}
+      {buyers.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-display text-2xl font-semibold" style={{ color: 'var(--gray-900)' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <h4 className="font-semibold text-lg" style={{ color: 'var(--gray-900)' }}>
               Buyers & Evaluators
-            </h3>
-            <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
-              {data.buyers.length} people
+            </h4>
+            <span
+              className="text-xs px-2 py-1 rounded-full"
+              style={{ backgroundColor: 'var(--purple-100)', color: 'var(--purple-700)' }}
+            >
+              {buyers.length} people
+            </span>
+            <span className="text-xs" style={{ color: 'var(--gray-400)' }}>
+              Decision makers
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.buyers.map((person, i) => (
+            {buyers.map((person, i) => (
               <PersonCard key={i} person={person} />
             ))}
           </div>
