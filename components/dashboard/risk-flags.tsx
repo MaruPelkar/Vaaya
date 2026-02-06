@@ -6,17 +6,17 @@ interface RiskFlagsProps {
   risks: Risk[];
 }
 
-const RISK_TYPE_CONFIG: Record<RiskType, { icon: string; label: string }> = {
-  security: { icon: '🔒', label: 'Security' },
-  reliability: { icon: '⚡', label: 'Reliability' },
-  platform: { icon: '🔗', label: 'Platform' },
-  regulatory: { icon: '📋', label: 'Regulatory' },
-  pricing: { icon: '💰', label: 'Pricing' },
+const RISK_TYPE_CONFIG: Record<RiskType, { label: string }> = {
+  security: { label: 'Security' },
+  reliability: { label: 'Reliability' },
+  platform: { label: 'Platform' },
+  regulatory: { label: 'Regulatory' },
+  pricing: { label: 'Pricing' },
 };
 
 const SEVERITY_CONFIG: Record<RiskSeverity, { color: string; bgColor: string; label: string }> = {
-  medium: { color: '#D97706', bgColor: 'rgba(245, 158, 11, 0.1)', label: 'Medium' },
-  high: { color: '#DC2626', bgColor: 'rgba(220, 38, 38, 0.1)', label: 'High' },
+  medium: { color: 'var(--warning)', bgColor: 'var(--warning-bg)', label: 'Medium' },
+  high: { color: 'var(--error)', bgColor: 'var(--error-bg)', label: 'High' },
 };
 
 export function RiskFlags({ risks }: RiskFlagsProps) {
@@ -29,11 +29,18 @@ export function RiskFlags({ risks }: RiskFlagsProps) {
   }
 
   return (
-    <div className="bento-box rounded-lg p-5" style={{ borderLeft: '4px solid #DC2626' }}>
-      <h3 className="text-xs uppercase tracking-wide font-medium mb-4 flex items-center gap-2" style={{ color: 'var(--vaaya-text-muted)' }}>
-        <span>⚠️</span>
-        Risk Flags
-      </h3>
+    <div
+      className="dashboard-card"
+      style={{ borderLeft: '4px solid var(--error)' }}
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--error)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <h3 className="metric-label">Risk Flags</h3>
+      </div>
 
       <div className="space-y-3">
         {relevantRisks.map((risk, i) => {
@@ -42,23 +49,26 @@ export function RiskFlags({ risks }: RiskFlagsProps) {
           return (
             <div
               key={i}
-              className="flex items-start gap-3 py-2 px-3 rounded-lg"
+              className="flex items-start gap-3 py-3 px-4 rounded-lg"
               style={{ backgroundColor: severityConfig.bgColor }}
             >
-              <span className="text-lg shrink-0">{typeConfig.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium" style={{ color: 'var(--vaaya-text)' }}>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--gray-900)' }}>
                     {typeConfig.label}
                   </span>
                   <span
-                    className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
-                    style={{ color: severityConfig.color }}
+                    className="badge"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: severityConfig.color,
+                      border: `1px solid ${severityConfig.color}`,
+                    }}
                   >
                     {severityConfig.label}
                   </span>
                 </div>
-                <p className="text-xs" style={{ color: 'var(--vaaya-text)' }}>
+                <p className="text-sm" style={{ color: 'var(--gray-700)' }}>
                   {risk.description}
                 </p>
               </div>

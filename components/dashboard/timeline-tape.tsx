@@ -10,10 +10,10 @@ interface TimelineTapeProps {
 }
 
 const EVENT_TYPE_CONFIG: Record<TimelineEventType, { label: string; color: string; bgColor: string }> = {
-  product: { label: 'Product', color: '#059669', bgColor: 'rgba(16, 185, 129, 0.1)' },
-  pricing: { label: 'Pricing', color: '#D97706', bgColor: 'rgba(245, 158, 11, 0.1)' },
-  gtm: { label: 'GTM', color: '#4F46E5', bgColor: 'rgba(99, 102, 241, 0.1)' },
-  security: { label: 'Security', color: '#DC2626', bgColor: 'rgba(220, 38, 38, 0.1)' },
+  product: { label: 'Product', color: 'var(--success)', bgColor: 'var(--success-bg)' },
+  pricing: { label: 'Pricing', color: 'var(--warning)', bgColor: 'var(--warning-bg)' },
+  gtm: { label: 'GTM', color: 'var(--info)', bgColor: 'var(--info-bg)' },
+  security: { label: 'Security', color: 'var(--error)', bgColor: 'var(--error-bg)' },
 };
 
 const FILTER_OPTIONS = [
@@ -37,11 +37,15 @@ export function TimelineTape({ events, initialFilter = 'all' }: TimelineTapeProp
   );
 
   return (
-    <div className="bento-box rounded-lg p-5">
+    <div className="dashboard-card">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xs uppercase tracking-wide font-medium" style={{ color: 'var(--vaaya-text-muted)' }}>
-          Timeline
-        </h3>
+        <div className="flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <h3 className="metric-label">Timeline</h3>
+        </div>
         <FilterPills
           options={FILTER_OPTIONS}
           value={filter}
@@ -56,12 +60,12 @@ export function TimelineTape({ events, initialFilter = 'all' }: TimelineTapeProp
             return (
               <div
                 key={event.id}
-                className="flex items-start gap-3 py-2 px-3 rounded-lg"
-                style={{ backgroundColor: 'var(--vaaya-neutral)' }}
+                className="flex items-start gap-3 py-3 px-4 rounded-lg transition-all"
+                style={{ backgroundColor: 'var(--gray-100)' }}
               >
                 {/* Event Type Badge */}
                 <span
-                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0"
+                  className="badge shrink-0"
                   style={{ backgroundColor: config.bgColor, color: config.color }}
                 >
                   {config.label}
@@ -69,11 +73,11 @@ export function TimelineTape({ events, initialFilter = 'all' }: TimelineTapeProp
 
                 {/* Event Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium" style={{ color: 'var(--vaaya-text)' }}>
+                  <div className="text-sm font-semibold" style={{ color: 'var(--gray-900)' }}>
                     {event.title}
                   </div>
                   {event.description && (
-                    <p className="text-xs mt-1" style={{ color: 'var(--vaaya-text-muted)' }}>
+                    <p className="text-sm mt-1" style={{ color: 'var(--gray-600)' }}>
                       {event.description}
                     </p>
                   )}
@@ -81,7 +85,7 @@ export function TimelineTape({ events, initialFilter = 'all' }: TimelineTapeProp
 
                 {/* Date and Source */}
                 <div className="text-right shrink-0">
-                  <div className="text-xs" style={{ color: 'var(--vaaya-text-muted)' }}>
+                  <div className="text-xs font-medium" style={{ color: 'var(--gray-500)' }}>
                     {formatDate(event.date)}
                   </div>
                   {event.source_url && (
@@ -89,8 +93,8 @@ export function TimelineTape({ events, initialFilter = 'all' }: TimelineTapeProp
                       href={event.source_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs hover:underline"
-                      style={{ color: 'var(--vaaya-brand)' }}
+                      className="text-xs font-medium hover:underline"
+                      style={{ color: 'var(--primary)' }}
                     >
                       Source
                     </a>
@@ -101,8 +105,8 @@ export function TimelineTape({ events, initialFilter = 'all' }: TimelineTapeProp
           })}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <span className="text-sm" style={{ color: 'var(--vaaya-text-muted)' }}>
+        <div className="text-center py-12">
+          <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
             No timeline events available
           </span>
         </div>

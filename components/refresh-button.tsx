@@ -10,23 +10,27 @@ export function RefreshButton({ loading, onClick }: RefreshButtonProps) {
     <button
       onClick={onClick}
       disabled={loading}
-      className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
+      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg disabled:opacity-50 transition-all duration-200"
       style={{
-        backgroundColor: 'var(--vaaya-neutral)',
-        color: 'var(--vaaya-text)',
-        border: '1px solid var(--vaaya-border)',
+        backgroundColor: 'var(--gray-100)',
+        color: 'var(--gray-700)',
+        border: '1px solid var(--gray-200)',
       }}
       onMouseEnter={(e) => {
         if (!loading) {
-          e.currentTarget.style.backgroundColor = 'var(--vaaya-border)';
+          e.currentTarget.style.backgroundColor = 'var(--primary)';
+          e.currentTarget.style.color = 'var(--white)';
+          e.currentTarget.style.borderColor = 'var(--primary)';
         }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--vaaya-neutral)';
+        e.currentTarget.style.backgroundColor = 'var(--gray-100)';
+        e.currentTarget.style.color = 'var(--gray-700)';
+        e.currentTarget.style.borderColor = 'var(--gray-200)';
       }}
     >
       <svg
-        className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
+        className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

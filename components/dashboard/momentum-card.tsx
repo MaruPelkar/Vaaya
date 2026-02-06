@@ -16,9 +16,9 @@ const TREND_ICONS: Record<string, string> = {
 };
 
 const TREND_COLORS: Record<string, string> = {
-  up: '#059669',
-  down: '#DC2626',
-  stable: '#6B7280',
+  up: 'var(--success)',
+  down: 'var(--error)',
+  stable: 'var(--gray-500)',
 };
 
 export function MomentumCard({
@@ -34,30 +34,34 @@ export function MomentumCard({
   }));
 
   return (
-    <div className="bento-box rounded-lg p-5 h-full flex flex-col">
-      <h3 className="text-xs uppercase tracking-wide font-medium mb-3" style={{ color: 'var(--vaaya-text-muted)' }}>
-        Momentum
-      </h3>
+    <div className="dashboard-card h-full flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="metric-label">Momentum</h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
 
       {/* Sparkline Chart */}
       {chartData.length > 0 && (
-        <div className="h-16 mb-3">
+        <div className="h-20 mb-4">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <XAxis dataKey="date" hide />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'var(--vaaya-white)',
-                  border: '1px solid var(--vaaya-border)',
-                  borderRadius: '4px',
+                  backgroundColor: 'var(--white)',
+                  border: '1px solid var(--gray-200)',
+                  borderRadius: 'var(--radius-md)',
                   fontSize: '12px',
+                  boxShadow: 'var(--shadow-md)',
                 }}
-                labelStyle={{ color: 'var(--vaaya-text-muted)' }}
+                labelStyle={{ color: 'var(--gray-500)' }}
               />
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="var(--vaaya-brand)"
+                stroke="var(--primary)"
                 strokeWidth={2}
                 dot={false}
               />
@@ -68,23 +72,29 @@ export function MomentumCard({
 
       {/* Summary Sentence */}
       {summary_sentence && (
-        <p className="text-xs mb-4" style={{ color: 'var(--vaaya-text)' }}>
+        <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--gray-700)' }}>
           {summary_sentence}
         </p>
       )}
 
       {/* Signals */}
       {signals.length > 0 && (
-        <div className="mt-auto pt-3 space-y-2" style={{ borderTop: '1px solid var(--vaaya-border)' }}>
+        <div className="mt-auto pt-4 space-y-3" style={{ borderTop: '1px solid var(--gray-200)' }}>
           {signals.slice(0, 3).map((signal, i) => (
-            <div key={i} className="flex items-center justify-between text-xs">
-              <span style={{ color: 'var(--vaaya-text-muted)' }}>
+            <div key={i} className="flex items-center justify-between text-sm">
+              <span className="font-medium" style={{ color: 'var(--gray-600)' }}>
                 {signal.type}
               </span>
-              <span className="font-medium flex items-center gap-1">
-                <span style={{ color: 'var(--vaaya-text)' }}>{signal.value}</span>
+              <span className="font-semibold flex items-center gap-2">
+                <span style={{ color: 'var(--gray-900)' }}>{signal.value}</span>
                 {signal.trend && (
-                  <span style={{ color: TREND_COLORS[signal.trend] || TREND_COLORS.stable }}>
+                  <span
+                    className="text-xs px-1.5 py-0.5 rounded"
+                    style={{
+                      color: TREND_COLORS[signal.trend] || TREND_COLORS.stable,
+                      backgroundColor: signal.trend === 'up' ? 'var(--success-bg)' : signal.trend === 'down' ? 'var(--error-bg)' : 'var(--gray-100)',
+                    }}
+                  >
                     {TREND_ICONS[signal.trend] || ''}
                   </span>
                 )}
@@ -97,7 +107,7 @@ export function MomentumCard({
       {/* Empty state */}
       {chartData.length === 0 && signals.length === 0 && !summary_sentence && (
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-xs" style={{ color: 'var(--vaaya-text-muted)' }}>
+          <span className="text-sm" style={{ color: 'var(--gray-500)' }}>
             No momentum data available
           </span>
         </div>
