@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { SearchBar } from '@/components/search-bar';
+import { UserMenu } from '@/components/user-menu';
 
 export default function HomePage() {
   const router = useRouter();
@@ -11,15 +12,15 @@ export default function HomePage() {
   };
 
   return (
-    <main className="hero gradient-primary">
-      <div className="hero-content animate-fade-in-up">
-        <span className="eyebrow text-white" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-          COMPANY INTELLIGENCE
-        </span>
-        <h1 className="headline-display hero-title">
-          Stop Guessing.<br />
-          Start Knowing Your<br />
-          Competitors.
+    <main className="min-h-screen" style={{ backgroundColor: 'var(--vaaya-white)' }}>
+      {/* Header with user menu */}
+      <header className="flex justify-end p-4">
+        <UserMenu />
+      </header>
+
+      <div className="max-w-4xl mx-auto pt-16 px-4">
+        <h1 className="headline-display text-center mb-6" style={{ color: 'var(--vaaya-text)' }}>
+          Company Intelligence
         </h1>
         <p className="hero-subtitle">
           Research any B2B company in seconds. Get deep insights on product, pricing, positioning, and more.

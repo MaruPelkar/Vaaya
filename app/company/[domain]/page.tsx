@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { CompanyTabs } from '@/components/company-tabs';
+import { UserMenu } from '@/components/user-menu';
 import {
   CompanyResponse,
   StreamEvent,
@@ -178,35 +179,26 @@ export default function CompanyPage({ params }: { params: Promise<{ domain: stri
   }
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: 'var(--off-white)' }}>
-      {/* Header Bar */}
-      <div
-        className="sticky top-0 z-50"
-        style={{
-          background: 'rgba(248, 250, 250, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: '1px solid var(--gray-200)',
-        }}
-      >
-        <div className="container-wide py-4 flex items-center justify-between">
-          <button
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all"
-            style={{ color: 'var(--gray-600)' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--gray-100)';
-              e.currentTarget.style.color = 'var(--gray-900)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = 'var(--gray-600)';
-            }}
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="font-medium">Back</span>
-          </button>
+    <main className="min-h-screen" style={{ backgroundColor: 'var(--vaaya-white)' }}>
+      {/* Header with user menu */}
+      <header className="flex justify-end p-4">
+        <UserMenu />
+      </header>
+
+      <div className="max-w-6xl mx-auto pb-12 px-4">
+        {/* Back button */}
+        <button
+          onClick={() => router.push('/')}
+          className="text-sm mb-8 flex items-center gap-1 transition-colors"
+          style={{ color: 'var(--vaaya-text-muted)' }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--vaaya-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--vaaya-text-muted)'}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to search
+        </button>
 
           {/* Company Name in Header */}
           <div className="flex items-center gap-3">
