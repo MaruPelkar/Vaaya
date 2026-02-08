@@ -2,16 +2,24 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 // Routes that don't require authentication
-const publicRoutes = ['/login', '/auth/callback'];
+const publicRoutes = ['/login', '/auth/callback', '/share'];
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Always redirect root to dashboard
+  if (pathname === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/dashboard';
+    return NextResponse.redirect(url);
+  }
+
   // Skip auth in development mode for easier local testing
   if (process.env.NODE_ENV === 'development') {
     return NextResponse.next();
   }
 
   const { supabaseResponse, user } = await updateSession(request);
-  const { pathname } = request.nextUrl;
 
   // Check if the current route is public
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
@@ -23,10 +31,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user is logged in and trying to access login page, redirect to home
+  // If user is logged in and trying to access login page, redirect to dashboard
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 

@@ -357,7 +357,7 @@ function PeopleTable({ users, buyers }: { users: DiscoveredPerson[]; buyers: Dis
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: 'var(--gray-500)' }}>
-        People at customer companies who likely use or buy this product, discovered via LinkedIn search.
+        People at customer companies discovered via reviews, job postings, LinkedIn posts, and webinars.
       </p>
       <div style={tableStyles.container}>
         <div style={tableStyles.wrapper}>
@@ -369,7 +369,8 @@ function PeopleTable({ users, buyers }: { users: DiscoveredPerson[]; buyers: Dis
                 <th style={tableStyles.th}>Company</th>
                 <th style={tableStyles.th}>Type</th>
                 <th style={tableStyles.th}>Confidence</th>
-                <th style={{ ...tableStyles.th, ...tableStyles.tdLast, textAlign: 'center' }}>Profile</th>
+                <th style={{ ...tableStyles.th, textAlign: 'center' }}>Contact</th>
+                <th style={{ ...tableStyles.th, ...tableStyles.tdLast, textAlign: 'center' }}>Source</th>
               </tr>
             </thead>
             <tbody>
@@ -397,41 +398,80 @@ function PeopleTable({ users, buyers }: { users: DiscoveredPerson[]; buyers: Dis
                   <td style={tableStyles.td}>
                     <ConfidenceBar score={person.confidence_score} />
                   </td>
+                  <td style={{ ...tableStyles.td, textAlign: 'center' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                      {person.linkedin_url && (
+                        <a
+                          href={person.linkedin_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="LinkedIn Profile"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '4px',
+                            backgroundColor: '#0077B5',
+                            color: 'white',
+                            transition: 'opacity 150ms ease',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                        >
+                          <LinkedInIcon />
+                        </a>
+                      )}
+                      {person.email && (
+                        <a
+                          href={`mailto:${person.email}`}
+                          title={person.email}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '4px',
+                            backgroundColor: 'var(--primary)',
+                            color: 'white',
+                            transition: 'opacity 150ms ease',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                        >
+                          <EmailIcon />
+                        </a>
+                      )}
+                      {person.phone && (
+                        <a
+                          href={`tel:${person.phone}`}
+                          title={person.phone}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '4px',
+                            backgroundColor: '#10B981',
+                            color: 'white',
+                            transition: 'opacity 150ms ease',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                        >
+                          <PhoneIcon />
+                        </a>
+                      )}
+                      {!person.linkedin_url && !person.email && !person.phone && (
+                        <span style={{ color: 'var(--gray-400)' }}>—</span>
+                      )}
+                    </div>
+                  </td>
                   <td style={{ ...tableStyles.td, ...tableStyles.tdLast, textAlign: 'center' }}>
-                    {person.linkedin_url ? (
-                      <a
-                        href={person.linkedin_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.375rem',
-                          padding: '0.375rem 0.75rem',
-                          fontSize: '0.8125rem',
-                          border: '1px solid var(--gray-300)',
-                          borderRadius: '4px',
-                          backgroundColor: 'var(--white)',
-                          color: 'var(--gray-700)',
-                          textDecoration: 'none',
-                          transition: 'all 150ms ease',
-                        }}
-                        className="hover:bg-gray-100 hover:border-gray-400"
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--gray-100)';
-                          e.currentTarget.style.borderColor = 'var(--gray-400)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--white)';
-                          e.currentTarget.style.borderColor = 'var(--gray-300)';
-                        }}
-                      >
-                        <LinkedInIcon />
-                        View
-                      </a>
-                    ) : (
-                      <span style={{ color: 'var(--gray-400)' }}>—</span>
-                    )}
+                    <SourceBadge signals={person.signals} />
                   </td>
                 </tr>
               ))}
@@ -484,5 +524,69 @@ function LinkedInIcon() {
     >
       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
+  );
+}
+
+function EmailIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  );
+}
+
+interface PersonSignal {
+  source: string;
+  text: string;
+  url: string | null;
+  date: string | null;
+}
+
+const sourceConfig: Record<string, { label: string; color: string; bg: string }> = {
+  nyne_search: { label: 'Nyne', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.1)' },
+  linkedin_search: { label: 'LinkedIn', color: '#0077B5', bg: 'rgba(0, 119, 181, 0.1)' },
+  g2_review: { label: 'G2', color: '#FF492C', bg: 'rgba(255, 73, 44, 0.1)' },
+  capterra_review: { label: 'Capterra', color: '#FF9D28', bg: 'rgba(255, 157, 40, 0.1)' },
+  producthunt: { label: 'PH', color: '#DA552F', bg: 'rgba(218, 85, 47, 0.1)' },
+  job_posting: { label: 'Jobs', color: '#059669', bg: 'rgba(5, 150, 105, 0.1)' },
+  linkedin_post: { label: 'Post', color: '#0077B5', bg: 'rgba(0, 119, 181, 0.1)' },
+  youtube_video: { label: 'YouTube', color: '#FF0000', bg: 'rgba(255, 0, 0, 0.1)' },
+  webinar: { label: 'Webinar', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.1)' },
+};
+
+function SourceBadge({ signals }: { signals: PersonSignal[] }) {
+  if (!signals || signals.length === 0) {
+    return <span style={{ color: 'var(--gray-400)' }}>—</span>;
+  }
+
+  const source = signals[0]?.source || 'unknown';
+  const config = sourceConfig[source] || { label: source.split('_')[0], color: 'var(--gray-600)', bg: 'var(--gray-100)' };
+
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        padding: '0.25rem 0.5rem',
+        fontSize: '0.625rem',
+        fontWeight: 600,
+        borderRadius: '4px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.03em',
+        backgroundColor: config.bg,
+        color: config.color,
+      }}
+      title={signals[0]?.text}
+    >
+      {config.label}
+    </span>
   );
 }
