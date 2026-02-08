@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { createBrowserClient } from '@/lib/db';
+import { usePathname } from 'next/navigation';
 
 // Simple SVG icons as components
 const icons = {
@@ -73,15 +71,6 @@ const settingsItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [loggingOut, setLoggingOut] = useState(false);
-  const supabase = createBrowserClient();
-
-  const handleSignOut = async () => {
-    setLoggingOut(true);
-    await supabase.auth.signOut();
-    router.push('/login');
-  };
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {
@@ -137,22 +126,7 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="nav-footer">
-        <button
-          onClick={handleSignOut}
-          disabled={loggingOut}
-          className="nav-item w-full text-left hover:bg-gray-100"
-          style={{ color: 'var(--gray-600)' }}
-        >
-          <span className="nav-item-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-          </span>
-          {loggingOut ? 'Signing out...' : 'Sign Out'}
-        </button>
-        <div className="text-xs text-gray-400 mt-2 px-3">
+        <div className="text-xs text-gray-400">
           <span className="font-mono">v0.1.0</span>
         </div>
       </div>

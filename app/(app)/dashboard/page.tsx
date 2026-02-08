@@ -3,6 +3,27 @@
 import { AppLayout } from '@/components/layout/app-layout';
 import Link from 'next/link';
 
+// Placeholder stats - will be replaced with real data
+const stats = [
+  { label: 'Active Campaigns', value: '3', change: '+1', positive: true },
+  { label: 'Total Participants', value: '156', change: '+24', positive: true },
+  { label: 'Completed Sessions', value: '42', change: '+8', positive: true },
+  { label: 'Pending Outreach', value: '18', change: '-5', positive: false },
+];
+
+const recentCampaigns = [
+  { id: '1', name: 'User Onboarding Research', client: 'Acme Corp', status: 'active', participants: 24, completion: 65 },
+  { id: '2', name: 'Feature Discovery', client: 'TechStart', status: 'active', participants: 18, completion: 40 },
+  { id: '3', name: 'Competitor Analysis', client: 'Acme Corp', status: 'draft', participants: 0, completion: 0 },
+];
+
+const recentActivity = [
+  { type: 'session', text: 'Completed interview with John D.', time: '2 hours ago', campaign: 'User Onboarding Research' },
+  { type: 'outreach', text: 'Email sent to 5 participants', time: '4 hours ago', campaign: 'Feature Discovery' },
+  { type: 'discovery', text: 'Found 12 new participants', time: '1 day ago', campaign: 'User Onboarding Research' },
+  { type: 'report', text: 'Generated executive summary', time: '2 days ago', campaign: 'User Onboarding Research' },
+];
+
 export default function DashboardPage() {
   return (
     <AppLayout breadcrumbs={[{ label: 'Dashboard' }]}>
@@ -19,15 +40,13 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-4 mb-6">
-        {[
-          { label: 'Active Campaigns', value: '0' },
-          { label: 'Total Participants', value: '0' },
-          { label: 'Completed Sessions', value: '0' },
-          { label: 'Pending Outreach', value: '0' },
-        ].map((stat) => (
+        {stats.map((stat) => (
           <div key={stat.label} className="metric-card">
             <div className="metric-header">
               <span className="metric-label">{stat.label}</span>
+              <span className={`metric-change ${stat.positive ? 'positive' : 'negative'}`}>
+                {stat.change}
+              </span>
             </div>
             <div className="metric-value">{stat.value}</div>
           </div>
@@ -36,7 +55,7 @@ export default function DashboardPage() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-3 gap-4">
-        {/* Active Campaigns - Empty State */}
+        {/* Active Campaigns */}
         <div className="col-span-2">
           <div className="table-container">
             <div className="table-header">
@@ -45,35 +64,69 @@ export default function DashboardPage() {
                 View all
               </Link>
             </div>
-            <div className="py-12 text-center">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--gray-400)' }}>
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                </svg>
-              </div>
-              <p className="text-sm text-gray-500 mb-4">No active campaigns yet</p>
-              <Link href="/campaigns/new" className="btn btn-primary btn-sm">
-                Create your first campaign
-              </Link>
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Campaign</th>
+                    <th>Client</th>
+                    <th>Status</th>
+                    <th>Participants</th>
+                    <th>Progress</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentCampaigns.map((campaign) => (
+                    <tr key={campaign.id}>
+                      <td>
+                        <Link href={`/campaigns/${campaign.id}`} className="text-gray-900 font-medium no-underline hover:underline">
+                          {campaign.name}
+                        </Link>
+                      </td>
+                      <td className="text-gray-500">{campaign.client}</td>
+                      <td>
+                        <span className={`badge badge-${campaign.status === 'active' ? 'success' : 'neutral'}`}>
+                          {campaign.status}
+                        </span>
+                      </td>
+                      <td className="font-mono">{campaign.participants}</td>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <div className="progress-bar w-20">
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${campaign.completion}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500 font-mono">{campaign.completion}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
-        {/* Recent Activity - Empty State */}
+        {/* Recent Activity */}
         <div className="col-span-1">
           <div className="card">
             <div className="card-header">
               <h3 className="card-title">Recent Activity</h3>
             </div>
-            <div className="py-8 text-center">
-              <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--gray-400)' }}>
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-              </div>
-              <p className="text-sm text-gray-500 m-0">No recent activity</p>
-              <p className="text-xs text-gray-400 m-0 mt-1">Activity will appear here as you work</p>
+            <div className="space-y-4">
+              {recentActivity.map((activity, index) => (
+                <div key={index} className="flex gap-3">
+                  <div className="w-2 h-2 rounded-full bg-gray-300 mt-2 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm text-gray-700 m-0">{activity.text}</p>
+                    <p className="text-xs text-gray-400 m-0 mt-0.5">
+                      {activity.campaign} &middot; {activity.time}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
