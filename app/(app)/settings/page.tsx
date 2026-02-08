@@ -1,8 +1,20 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
+import { createBrowserClient } from '@/lib/db';
 
 export default function SettingsPage() {
+  const [loggingOut, setLoggingOut] = useState(false);
+  const router = useRouter();
+  const supabase = createBrowserClient();
+
+  const handleSignOut = async () => {
+    setLoggingOut(true);
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
   return (
     <AppLayout breadcrumbs={[{ label: 'Settings' }]}>
       <div className="page-header">
@@ -145,8 +157,12 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-600 m-0 mt-1">2 members</p>
             </div>
             <hr className="border-gray-200" />
-            <button className="btn btn-secondary w-full">
-              Sign Out
+            <button
+              onClick={handleSignOut}
+              disabled={loggingOut}
+              className="btn btn-secondary w-full"
+            >
+              {loggingOut ? 'Signing out...' : 'Sign Out'}
             </button>
           </div>
         </div>
