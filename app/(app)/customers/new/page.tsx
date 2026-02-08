@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { createBrowserClient } from '@/lib/db';
 
-export default function NewClientPage() {
+export default function NewCustomerPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,10 +33,10 @@ export default function NewClientPage() {
 
       if (insertError) throw insertError;
 
-      router.push(`/clients/${data.id}`);
+      router.push(`/customers/${data.id}`);
     } catch (err) {
-      console.error('Error creating client:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create client');
+      console.error('Error creating customer:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create customer');
     } finally {
       setLoading(false);
     }
@@ -50,16 +50,16 @@ export default function NewClientPage() {
   return (
     <AppLayout
       breadcrumbs={[
-        { label: 'Clients', href: '/clients' },
-        { label: 'New Client' },
+        { label: 'Customers', href: '/customers' },
+        { label: 'New Customer' },
       ]}
     >
       <div className="max-w-2xl">
         {/* Page Header */}
         <div className="page-header">
           <div>
-            <h1 className="page-title">Add New Client</h1>
-            <p className="page-description">Create a new client to organize your research campaigns</p>
+            <h1 className="page-title">Add New Customer</h1>
+            <p className="page-description">Create a new customer to organize your research campaigns</p>
           </div>
         </div>
 
@@ -158,7 +158,7 @@ export default function NewClientPage() {
                   value={formData.notes}
                   onChange={handleChange}
                   className="input textarea"
-                  placeholder="Any additional notes about this client..."
+                  placeholder="Any additional notes about this customer..."
                   rows={4}
                 />
               </div>
@@ -180,7 +180,7 @@ export default function NewClientPage() {
               className="btn btn-primary"
               disabled={loading || !formData.name}
             >
-              {loading ? 'Creating...' : 'Create Client'}
+              {loading ? 'Creating...' : 'Create Customer'}
             </button>
           </div>
         </form>

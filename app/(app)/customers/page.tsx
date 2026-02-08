@@ -6,16 +6,16 @@ import Link from 'next/link';
 import { createBrowserClient } from '@/lib/db';
 import type { Client } from '@/lib/types/research';
 
-export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([]);
+export default function CustomersPage() {
+  const [customers, setCustomers] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetchClients();
+    fetchCustomers();
   }, []);
 
-  async function fetchClients() {
+  async function fetchCustomers() {
     try {
       const supabase = createBrowserClient();
       const { data, error } = await supabase
@@ -24,29 +24,29 @@ export default function ClientsPage() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setClients(data || []);
+      setCustomers(data || []);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      console.error('Error fetching customers:', error);
     } finally {
       setLoading(false);
     }
   }
 
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.industry?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCustomers = customers.filter((customer) =>
+    customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    customer.industry?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <AppLayout breadcrumbs={[{ label: 'Clients' }]}>
+    <AppLayout breadcrumbs={[{ label: 'Customers' }]}>
       {/* Page Header */}
       <div className="page-header">
         <div>
-          <h1 className="page-title">Clients</h1>
-          <p className="page-description">Manage your client companies</p>
+          <h1 className="page-title">Customers</h1>
+          <p className="page-description">Manage your customer companies</p>
         </div>
-        <Link href="/clients/new" className="btn btn-primary">
-          Add Client
+        <Link href="/customers/new" className="btn btn-primary">
+          Add Customer
         </Link>
       </div>
 
@@ -55,7 +55,7 @@ export default function ClientsPage() {
         <div className="filter-group flex-1">
           <input
             type="text"
-            placeholder="Search clients..."
+            placeholder="Search customers..."
             className="input input-sm w-64"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -72,7 +72,7 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      {/* Clients Grid */}
+      {/* Customers Grid */}
       {loading ? (
         <div className="grid grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
@@ -83,7 +83,7 @@ export default function ClientsPage() {
             </div>
           ))}
         </div>
-      ) : filteredClients.length === 0 ? (
+      ) : filteredCustomers.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -91,44 +91,44 @@ export default function ClientsPage() {
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </div>
-          <h3 className="empty-state-title">No clients yet</h3>
+          <h3 className="empty-state-title">No customers yet</h3>
           <p className="empty-state-text">
-            Add your first client to start managing research campaigns.
+            Add your first customer to start managing research campaigns.
           </p>
-          <Link href="/clients/new" className="btn btn-primary">
-            Add Client
+          <Link href="/customers/new" className="btn btn-primary">
+            Add Customer
           </Link>
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-4">
-          {filteredClients.map((client) => (
+          {filteredCustomers.map((customer) => (
             <Link
-              key={client.id}
-              href={`/clients/${client.id}`}
+              key={customer.id}
+              href={`/customers/${customer.id}`}
               className="card card-hover no-underline group"
             >
               <div className="flex items-start gap-4">
                 <div className="avatar avatar-xl bg-gray-100">
-                  {client.logo_url ? (
-                    <img src={client.logo_url} alt={client.name} />
+                  {customer.logo_url ? (
+                    <img src={customer.logo_url} alt={customer.name} />
                   ) : (
-                    <span className="text-gray-400">{client.name[0]}</span>
+                    <span className="text-gray-400">{customer.name[0]}</span>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-semibold text-gray-900 m-0 group-hover:underline">
-                    {client.name}
+                    {customer.name}
                   </h3>
-                  {client.industry && (
-                    <p className="text-sm text-gray-500 m-0 mt-1">{client.industry}</p>
+                  {customer.industry && (
+                    <p className="text-sm text-gray-500 m-0 mt-1">{customer.industry}</p>
                   )}
                   <div className="flex items-center gap-3 mt-3">
                     <span className="text-xs text-gray-400">
-                      <span className="font-mono font-medium text-gray-600">{client.campaigns_count || 0}</span> campaigns
+                      <span className="font-mono font-medium text-gray-600">{customer.campaigns_count || 0}</span> campaigns
                     </span>
-                    {client.website && (
+                    {customer.website && (
                       <span className="text-xs text-gray-400 truncate">
-                        {client.website.replace(/^https?:\/\//, '')}
+                        {customer.website.replace(/^https?:\/\//, '')}
                       </span>
                     )}
                   </div>
