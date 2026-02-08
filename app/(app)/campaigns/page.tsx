@@ -153,10 +153,10 @@ export default function CampaignsPage() {
               <thead>
                 <tr>
                   <th>Campaign</th>
-                  <th>Client</th>
+                  <th>Customer</th>
                   <th>Status</th>
                   <th>Budget</th>
-                  <th>Dates</th>
+                  <th>Start Date</th>
                   <th>Created</th>
                 </tr>
               </thead>
@@ -178,7 +178,7 @@ export default function CampaignsPage() {
                     </td>
                     <td>
                       <Link
-                        href={`/clients/${campaign.client_id}`}
+                        href={`/customers/${campaign.client_id}`}
                         className="text-gray-600 no-underline hover:underline"
                       >
                         {campaign.client?.name || 'Unknown'}
@@ -202,9 +202,6 @@ export default function CampaignsPage() {
                       {campaign.start_date ? (
                         <span>
                           {new Date(campaign.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          {campaign.end_date && (
-                            <> - {new Date(campaign.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</>
-                          )}
                         </span>
                       ) : (
                         <span className="text-gray-400">Not set</span>

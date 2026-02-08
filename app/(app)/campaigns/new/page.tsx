@@ -6,29 +6,33 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { createBrowserClient } from '@/lib/db';
 import type { Client } from '@/lib/types/research';
 
+function getTodayDate() {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+}
+
 function NewCampaignForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const preselectedClientId = searchParams.get('client');
+  const preselectedCustomerId = searchParams.get('customer');
 
   const [loading, setLoading] = useState(false);
-  const [clients, setClients] = useState<Client[]>([]);
+  const [customers, setCustomers] = useState<Client[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    client_id: preselectedClientId || '',
+    client_id: preselectedCustomerId || '',
     name: '',
     description: '',
     research_goals: [''],
     budget_estimated: '',
-    start_date: '',
-    end_date: '',
+    start_date: getTodayDate(),
   });
 
   useEffect(() => {
-    fetchClients();
+    fetchCustomers();
   }, []);
 
-  async function fetchClients() {
+  async function fetchCustomers() {
     try {
       const supabase = createBrowserClient();
       const { data, error } = await supabase
@@ -37,9 +41,9 @@ function NewCampaignForm() {
         .order('name');
 
       if (error) throw error;
-      setClients(data || []);
+      setCustomers(data || []);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      console.error('Error fetching customers:', error);
     }
   }
 
@@ -58,7 +62,6 @@ function NewCampaignForm() {
         research_goals: formData.research_goals.filter((g) => g.trim()),
         budget_estimated: formData.budget_estimated ? parseFloat(formData.budget_estimated) : 0,
         start_date: formData.start_date || null,
-        end_date: formData.end_date || null,
         status: 'draft',
       };
 
@@ -113,7 +116,7 @@ function NewCampaignForm() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Create New Campaign</h1>
-            <p className="page-description">Set up a new research campaign for a client</p>
+            <p className="page-description">Set up a new research campaign for a customer</p>
           </div>
         </div>
 
@@ -127,9 +130,9 @@ function NewCampaignForm() {
             )}
 
             <div className="space-y-4">
-              {/* Client */}
+              {/* Customer */}
               <div className="form-group">
-                <label className="form-label">Client *</label>
+                <label className="form-label">Customer *</label>
                 <select
                   name="client_id"
                   value={formData.client_id}
@@ -137,16 +140,16 @@ function NewCampaignForm() {
                   className="select w-full"
                   required
                 >
-                  <option value="">Select a client...</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.name}
+                  <option value="">Select a customer...</option>
+                  {customers.map((customer) => (
+                    <option key={customer.id} value={customer.id}>
+                      {customer.name}
                     </option>
                   ))}
                 </select>
                 <p className="form-hint">
-                  Don&apos;t see your client?{' '}
-                  <a href="/clients/new" className="text-primary">Add a new client</a>
+                  Don&apos;t see your customer?{' '}
+                  <a href="/customers/new" className="text-primary">Add a new customer</a>
                 </p>
               </div>
 
@@ -235,28 +238,16 @@ function NewCampaignForm() {
                 <p className="form-hint">Include costs for incentives, tools, and outreach</p>
               </div>
 
-              {/* Dates */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-group">
-                  <label className="form-label">Start Date</label>
-                  <input
-                    type="date"
-                    name="start_date"
-                    value={formData.start_date}
-                    onChange={handleChange}
-                    className="input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">End Date</label>
-                  <input
-                    type="date"
-                    name="end_date"
-                    value={formData.end_date}
-                    onChange={handleChange}
-                    className="input"
-                  />
-                </div>
+              {/* Start Date */}
+              <div className="form-group">
+                <label className="form-label">Start Date</label>
+                <input
+                  type="date"
+                  name="start_date"
+                  value={formData.start_date}
+                  onChange={handleChange}
+                  className="input w-48"
+                />
               </div>
             </div>
           </div>

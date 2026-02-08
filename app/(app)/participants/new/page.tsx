@@ -11,7 +11,10 @@ const departmentOptions = ['Engineering', 'Product', 'Design', 'Marketing', 'Sal
 export default function NewParticipantPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [enriching, setEnriching] = useState(false);
+  const [enrichMessage, setEnrichMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [profileUrl, setProfileUrl] = useState('');
   const [formData, setFormData] = useState({
     full_name: '',
     first_name: '',
@@ -31,6 +34,65 @@ export default function NewParticipantPage() {
     tags: '',
   });
 
+  async function handleProfileUrlChange(url: string) {
+    setProfileUrl(url);
+    setEnrichMessage(null);
+
+    // Auto-enrich when a valid URL is pasted
+    if (url && (url.includes('linkedin.com') || url.includes('twitter.com') || url.includes('x.com'))) {
+      await enrichFromUrl(url);
+    }
+  }
+
+  async function enrichFromUrl(url: string) {
+    setEnriching(true);
+    setEnrichMessage(null);
+
+    try {
+      const response = await fetch('/api/participants/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setEnrichMessage(data.error || 'Failed to fetch profile data');
+        return;
+      }
+
+      if (data.success && data.data) {
+        // Merge the enriched data with existing form data (don't overwrite non-empty fields)
+        setFormData((prev) => ({
+          ...prev,
+          full_name: data.data.full_name || prev.full_name,
+          first_name: data.data.first_name || prev.first_name,
+          last_name: data.data.last_name || prev.last_name,
+          job_title: data.data.job_title || prev.job_title,
+          company_name: data.data.company_name || prev.company_name,
+          company_industry: data.data.company_industry || prev.company_industry,
+          city: data.data.city || prev.city,
+          country: data.data.country || prev.country,
+          seniority_level: data.data.seniority_level || prev.seniority_level,
+          department: data.data.department || prev.department,
+          linkedin_url: data.data.linkedin_url || prev.linkedin_url,
+        }));
+
+        if (data.message) {
+          setEnrichMessage(data.message);
+        } else {
+          setEnrichMessage('Profile data loaded successfully!');
+        }
+      }
+    } catch (err) {
+      console.error('Error enriching profile:', err);
+      setEnrichMessage('Failed to fetch profile data. Please fill in manually.');
+    } finally {
+      setEnriching(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -42,7 +104,7 @@ export default function NewParticipantPage() {
       const payload = {
         ...formData,
         tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
-        source: 'manual',
+        source: profileUrl ? 'profile_import' : 'manual',
       };
 
       const { data, error: insertError } = await supabase
@@ -92,7 +154,47 @@ export default function NewParticipantPage() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Add New Participant</h1>
-            <p className="page-description">Manually add a participant to your global pool</p>
+            <p className="page-description">Add a participant manually or import from a profile URL</p>
+          </div>
+        </div>
+
+        {/* Profile URL Import */}
+        <div className="card mb-4" style={{ backgroundColor: 'var(--gray-50)', border: '2px dashed var(--gray-200)' }}>
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-0.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--primary)' }}>
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <label className="form-label font-semibold" style={{ color: 'var(--gray-900)' }}>
+                Quick Import from Profile URL
+              </label>
+              <p className="text-sm text-gray-500 mb-2">
+                Paste a LinkedIn or Twitter profile URL to auto-fill the form
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={profileUrl}
+                  onChange={(e) => handleProfileUrlChange(e.target.value)}
+                  className="input flex-1"
+                  placeholder="https://linkedin.com/in/johndoe or https://twitter.com/johndoe"
+                  disabled={enriching}
+                />
+                {enriching && (
+                  <div className="flex items-center px-3">
+                    <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                  </div>
+                )}
+              </div>
+              {enrichMessage && (
+                <p className={`text-sm mt-2 ${enrichMessage.includes('success') ? 'text-green-600' : 'text-amber-600'}`}>
+                  {enrichMessage}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 

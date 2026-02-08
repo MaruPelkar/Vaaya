@@ -129,7 +129,7 @@ export default function CampaignDetailPage() {
             </span>
           </div>
           <p className="page-description">
-            <Link href={`/clients/${campaign.client_id}`} className="text-gray-500 hover:underline">
+            <Link href={`/customers/${campaign.client_id}`} className="text-gray-500 hover:underline">
               {campaign.client?.name}
             </Link>
             {campaign.description && <span className="mx-2">&middot;</span>}
@@ -273,21 +273,18 @@ export default function CampaignDetailPage() {
               </div>
               <div className="space-y-3 text-sm">
                 <div>
-                  <span className="label">Client</span>
+                  <span className="label">Customer</span>
                   <p className="m-0 mt-1">
-                    <Link href={`/clients/${campaign.client_id}`} className="text-gray-900 hover:underline">
+                    <Link href={`/customers/${campaign.client_id}`} className="text-gray-900 hover:underline">
                       {campaign.client?.name}
                     </Link>
                   </p>
                 </div>
                 {campaign.start_date && (
                   <div>
-                    <span className="label">Dates</span>
+                    <span className="label">Start Date</span>
                     <p className="m-0 mt-1 text-gray-700">
                       {new Date(campaign.start_date).toLocaleDateString()}
-                      {campaign.end_date && (
-                        <> - {new Date(campaign.end_date).toLocaleDateString()}</>
-                      )}
                     </p>
                   </div>
                 )}

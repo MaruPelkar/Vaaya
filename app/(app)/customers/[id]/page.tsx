@@ -7,35 +7,35 @@ import Link from 'next/link';
 import { createBrowserClient } from '@/lib/db';
 import type { Client, Campaign } from '@/lib/types/research';
 
-export default function ClientDetailPage() {
+export default function CustomerDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [client, setClient] = useState<Client | null>(null);
+  const [customer, setCustomer] = useState<Client | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Client>>({});
 
   useEffect(() => {
-    fetchClient();
+    fetchCustomer();
   }, [params.id]);
 
-  async function fetchClient() {
+  async function fetchCustomer() {
     try {
       const supabase = createBrowserClient();
 
-      // Fetch client
-      const { data: clientData, error: clientError } = await supabase
+      // Fetch customer
+      const { data: customerData, error: customerError } = await supabase
         .from('clients')
         .select('*')
         .eq('id', params.id)
         .single();
 
-      if (clientError) throw clientError;
-      setClient(clientData);
-      setFormData(clientData);
+      if (customerError) throw customerError;
+      setCustomer(customerData);
+      setFormData(customerData);
 
-      // Fetch campaigns for this client
+      // Fetch campaigns for this customer
       const { data: campaignsData, error: campaignsError } = await supabase
         .from('campaigns')
         .select('*')
@@ -45,7 +45,7 @@ export default function ClientDetailPage() {
       if (campaignsError) throw campaignsError;
       setCampaigns(campaignsData || []);
     } catch (error) {
-      console.error('Error fetching client:', error);
+      console.error('Error fetching customer:', error);
     } finally {
       setLoading(false);
     }
@@ -61,15 +61,15 @@ export default function ClientDetailPage() {
 
       if (error) throw error;
 
-      setClient({ ...client, ...formData } as Client);
+      setCustomer({ ...customer, ...formData } as Client);
       setEditing(false);
     } catch (error) {
-      console.error('Error updating client:', error);
+      console.error('Error updating customer:', error);
     }
   }
 
   async function handleDelete() {
-    if (!confirm('Are you sure you want to delete this client? This will also delete all associated campaigns.')) {
+    if (!confirm('Are you sure you want to delete this customer? This will also delete all associated campaigns.')) {
       return;
     }
 
@@ -81,15 +81,15 @@ export default function ClientDetailPage() {
         .eq('id', params.id);
 
       if (error) throw error;
-      router.push('/clients');
+      router.push('/customers');
     } catch (error) {
-      console.error('Error deleting client:', error);
+      console.error('Error deleting customer:', error);
     }
   }
 
   if (loading) {
     return (
-      <AppLayout breadcrumbs={[{ label: 'Clients', href: '/clients' }, { label: 'Loading...' }]}>
+      <AppLayout breadcrumbs={[{ label: 'Customers', href: '/customers' }, { label: 'Loading...' }]}>
         <div className="animate-pulse">
           <div className="skeleton h-8 w-48 mb-2" />
           <div className="skeleton h-4 w-32" />
@@ -98,13 +98,13 @@ export default function ClientDetailPage() {
     );
   }
 
-  if (!client) {
+  if (!customer) {
     return (
-      <AppLayout breadcrumbs={[{ label: 'Clients', href: '/clients' }, { label: 'Not Found' }]}>
+      <AppLayout breadcrumbs={[{ label: 'Customers', href: '/customers' }, { label: 'Not Found' }]}>
         <div className="empty-state">
-          <h3 className="empty-state-title">Client not found</h3>
-          <Link href="/clients" className="btn btn-primary mt-4">
-            Back to Clients
+          <h3 className="empty-state-title">Customer not found</h3>
+          <Link href="/customers" className="btn btn-primary mt-4">
+            Back to Customers
           </Link>
         </div>
       </AppLayout>
@@ -114,32 +114,32 @@ export default function ClientDetailPage() {
   return (
     <AppLayout
       breadcrumbs={[
-        { label: 'Clients', href: '/clients' },
-        { label: client.name },
+        { label: 'Customers', href: '/customers' },
+        { label: customer.name },
       ]}
     >
       {/* Page Header */}
       <div className="page-header">
         <div className="flex items-center gap-4">
           <div className="avatar avatar-xl bg-gray-100">
-            {client.logo_url ? (
-              <img src={client.logo_url} alt={client.name} />
+            {customer.logo_url ? (
+              <img src={customer.logo_url} alt={customer.name} />
             ) : (
-              <span className="text-gray-400 text-2xl">{client.name[0]}</span>
+              <span className="text-gray-400 text-2xl">{customer.name[0]}</span>
             )}
           </div>
           <div>
-            <h1 className="page-title">{client.name}</h1>
+            <h1 className="page-title">{customer.name}</h1>
             <p className="page-description">
-              {client.industry && <span>{client.industry}</span>}
-              {client.website && (
+              {customer.industry && <span>{customer.industry}</span>}
+              {customer.website && (
                 <a
-                  href={client.website}
+                  href={customer.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-3 text-primary hover:underline"
                 >
-                  {client.website.replace(/^https?:\/\//, '')}
+                  {customer.website.replace(/^https?:\/\//, '')}
                 </a>
               )}
             </p>
@@ -149,7 +149,7 @@ export default function ClientDetailPage() {
           <button onClick={() => setEditing(!editing)} className="btn btn-secondary">
             {editing ? 'Cancel' : 'Edit'}
           </button>
-          <Link href={`/campaigns/new?client=${client.id}`} className="btn btn-primary">
+          <Link href={`/campaigns/new?customer=${customer.id}`} className="btn btn-primary">
             New Campaign
           </Link>
         </div>
@@ -167,7 +167,7 @@ export default function ClientDetailPage() {
             {campaigns.length === 0 ? (
               <div className="empty-state py-8">
                 <p className="empty-state-text">No campaigns yet</p>
-                <Link href={`/campaigns/new?client=${client.id}`} className="btn btn-outline btn-sm">
+                <Link href={`/campaigns/new?customer=${customer.id}`} className="btn btn-outline btn-sm">
                   Create First Campaign
                 </Link>
               </div>
@@ -289,27 +289,27 @@ export default function ClientDetailPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {client.contact_name && (
+                {customer.contact_name && (
                   <div>
                     <span className="label">Contact</span>
-                    <p className="text-sm text-gray-900 m-0 mt-1">{client.contact_name}</p>
-                    {client.contact_email && (
-                      <a href={`mailto:${client.contact_email}`} className="text-sm text-primary">
-                        {client.contact_email}
+                    <p className="text-sm text-gray-900 m-0 mt-1">{customer.contact_name}</p>
+                    {customer.contact_email && (
+                      <a href={`mailto:${customer.contact_email}`} className="text-sm text-primary">
+                        {customer.contact_email}
                       </a>
                     )}
                   </div>
                 )}
-                {client.notes && (
+                {customer.notes && (
                   <div>
                     <span className="label">Notes</span>
-                    <p className="text-sm text-gray-600 m-0 mt-1 whitespace-pre-wrap">{client.notes}</p>
+                    <p className="text-sm text-gray-600 m-0 mt-1 whitespace-pre-wrap">{customer.notes}</p>
                   </div>
                 )}
                 <div>
                   <span className="label">Created</span>
                   <p className="text-sm text-gray-600 m-0 mt-1">
-                    {new Date(client.created_at).toLocaleDateString()}
+                    {new Date(customer.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -322,10 +322,10 @@ export default function ClientDetailPage() {
               <h3 className="card-title text-red-600">Danger Zone</h3>
             </div>
             <p className="text-sm text-gray-500 mb-3">
-              Deleting this client will also delete all associated campaigns and data.
+              Deleting this customer will also delete all associated campaigns and data.
             </p>
             <button onClick={handleDelete} className="btn btn-danger w-full">
-              Delete Client
+              Delete Customer
             </button>
           </div>
         </div>
