@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import Link from 'next/link';
 import { createBrowserClient } from '@/lib/db';
@@ -26,7 +26,6 @@ const tabs = [
 
 export default function CampaignDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const [campaign, setCampaign] = useState<Campaign & { client: { name: string } } | null>(null);
   const [participants, setParticipants] = useState<(CampaignParticipant & { participant: { full_name: string; email: string; company_name: string } })[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,21 +62,6 @@ export default function CampaignDetailPage() {
       console.error('Error fetching campaign:', error);
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function updateStatus(newStatus: CampaignStatus) {
-    try {
-      const supabase = createBrowserClient();
-      const { error } = await supabase
-        .from('campaigns')
-        .update({ status: newStatus })
-        .eq('id', params.id);
-
-      if (error) throw error;
-      setCampaign((prev) => prev ? { ...prev, status: newStatus } : null);
-    } catch (error) {
-      console.error('Error updating status:', error);
     }
   }
 
@@ -135,28 +119,6 @@ export default function CampaignDetailPage() {
             {campaign.description && <span className="mx-2">&middot;</span>}
             {campaign.description && <span>{campaign.description}</span>}
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {campaign.status === 'draft' && (
-            <button onClick={() => updateStatus('active')} className="btn btn-primary">
-              Start Campaign
-            </button>
-          )}
-          {campaign.status === 'active' && (
-            <>
-              <button onClick={() => updateStatus('paused')} className="btn btn-secondary">
-                Pause
-              </button>
-              <button onClick={() => updateStatus('completed')} className="btn btn-primary">
-                Complete
-              </button>
-            </>
-          )}
-          {campaign.status === 'paused' && (
-            <button onClick={() => updateStatus('active')} className="btn btn-primary">
-              Resume
-            </button>
-          )}
         </div>
       </div>
 

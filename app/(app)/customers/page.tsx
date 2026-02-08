@@ -18,13 +18,22 @@ export default function CustomersPage() {
   async function fetchCustomers() {
     try {
       const supabase = createBrowserClient();
+
+      // Fetch customers with campaign count
       const { data, error } = await supabase
         .from('clients')
-        .select('*')
+        .select('*, campaigns(count)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCustomers(data || []);
+
+      // Transform data to include campaigns_count
+      const customersWithCount = (data || []).map(customer => ({
+        ...customer,
+        campaigns_count: customer.campaigns?.[0]?.count || 0,
+      }));
+
+      setCustomers(customersWithCount);
     } catch (error) {
       console.error('Error fetching customers:', error);
     } finally {
