@@ -69,27 +69,46 @@ export async function POST(request: NextRequest) {
     }
 
     // Scrape the profile using Firecrawl
-    const scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${firecrawlApiKey}`,
-      },
-      body: JSON.stringify({
-        url,
-        formats: ['markdown'],
-      }),
-    });
-
-    if (!scrapeResponse.ok) {
-      // If scraping fails, just return the URL
+    let scrapeResponse;
+    try {
+      scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${firecrawlApiKey}`,
+        },
+        body: JSON.stringify({
+          url,
+          formats: ['markdown'],
+        }),
+      });
+    } catch (fetchError) {
+      console.error('Firecrawl fetch error:', fetchError);
       return NextResponse.json({
         success: true,
         data: {
           linkedin_url: profileType === 'linkedin' ? url : '',
           source: profileType,
         },
-        message: 'Could not fetch profile data. Please fill in the details manually.'
+        message: profileType === 'linkedin'
+          ? 'LinkedIn profiles require authentication to scrape. URL saved - please fill in other details manually.'
+          : 'Could not fetch profile data. URL saved - please fill in details manually.'
+      });
+    }
+
+    if (!scrapeResponse.ok) {
+      // If scraping fails, just return the URL with a helpful message
+      const errorText = await scrapeResponse.text().catch(() => 'Unknown error');
+      console.error('Firecrawl error:', scrapeResponse.status, errorText);
+      return NextResponse.json({
+        success: true,
+        data: {
+          linkedin_url: profileType === 'linkedin' ? url : '',
+          source: profileType,
+        },
+        message: profileType === 'linkedin'
+          ? 'LinkedIn profiles are protected. URL saved - please fill in other details manually.'
+          : 'Could not fetch profile data. URL saved - please fill in details manually.'
       });
     }
 

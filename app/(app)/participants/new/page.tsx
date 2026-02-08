@@ -190,7 +190,7 @@ export default function NewParticipantPage() {
                 )}
               </div>
               {enrichMessage && (
-                <p className={`text-sm mt-2 ${enrichMessage.includes('success') ? 'text-green-600' : 'text-amber-600'}`}>
+                <p className={`text-sm mt-2 ${enrichMessage.includes('successfully') ? 'text-green-600' : enrichMessage.includes('URL saved') ? 'text-blue-600' : 'text-amber-600'}`}>
                   {enrichMessage}
                 </p>
               )}
