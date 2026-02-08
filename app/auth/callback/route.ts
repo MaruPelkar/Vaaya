@@ -2,6 +2,12 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+// Allowed users - only these emails can access the app
+const ALLOWED_EMAILS = [
+  'coolnakul@gmail.com',
+  'apoorvkhanna88@gmail.com',
+];
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
@@ -34,7 +40,17 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      // Check if user's email is in the allowed list
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user?.email && ALLOWED_EMAILS.includes(user.email.toLowerCase())) {
+        // User is allowed, redirect to app
+        return NextResponse.redirect(`${origin}${next}`);
+      } else {
+        // User not allowed - sign them out and redirect with error
+        await supabase.auth.signOut();
+        return NextResponse.redirect(`${origin}/login?error=unauthorized`);
+      }
     }
   }
 
